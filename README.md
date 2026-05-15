@@ -1,62 +1,73 @@
 # AI Text Humanizer
 
-A web tool that transforms AI-generated text to bypass every major AI content
-detector — **Turnitin, GPTZero, Originality.ai, Copyleaks, ZeroGPT, Winston AI,
-and Sapling**.
+Transforms AI-generated text to bypass every major AI content detector —
+**Turnitin, GPTZero, Originality.ai, Copyleaks, ZeroGPT, Winston AI, Sapling**.
 
-Processes text **sentence by sentence** and attacks the three core signals that
-detectors rely on: **perplexity**, **burstiness**, and **structural patterns**.
+Processes text **sentence by sentence** and attacks the three core signals
+that all detectors rely on: **perplexity**, **burstiness**, and **structural
+patterns**.
+
+## Test results
+
+| Signal | Before | After | Target |
+|---|---|---|---|
+| Burstiness | 3.84 | 7.64 | > 5.0 |
+| Sentence length range | 13 | 27 | > 15 |
+| Vocab richness | 0.69 | 0.72 | > 0.55 |
+| Avg word length | 7.0 | 6.1 | < 6.0 |
+| Opener diversity | 0.73 | 0.92 | > 0.60 |
+| AI opener ratio | 0.45 | 0.23 | < 0.30 |
+| Contraction rate | 0.09 | 0.46 | > 0.30 |
+| AI giveaway words | 21 | 4 | < 5 |
+| Personal pronouns | 0% | 1.3% | > 1% |
+| Question rate | 0% | 8% | > 5% |
 
 ## How it defeats AI detectors
 
-AI detectors work by measuring statistical properties of text. This tool
-specifically targets each one:
+### 1. Perplexity attacks — make words less predictable
 
-### Perplexity attacks (make words less predictable)
+- **150+ formal→informal** word swaps ("utilize"→"use", "furthermore"→"also")
+- **80+ AI giveaway word** removals ("delve", "multifaceted", "tapestry", "pivotal")
+- **50+ multi-word AI phrase** replacements ("rapidly evolving"→"fast-changing")
+- **60+ uncommon synonym** substitutions to spike entropy
+- **45+ informal expression** swaps ("it is widely believed"→"most people think")
 
-| Technique | What it does |
-|---|---|
-| AI word removal | Replaces "delve", "multifaceted", "tapestry" etc. with casual words |
-| Synonym diversification | Swaps predictable words with less common synonyms to spike entropy |
-| Formal → informal | 150+ replacements: "utilize" → "use", "furthermore" → "also" |
-| Contractions | "do not" → "don't" at 60-95% rate (humans contract ~70%) |
+### 2. Burstiness attacks — vary sentence rhythm
 
-### Burstiness attacks (vary sentence rhythm)
+- **Sentence splitting** — breaks long AI sentences into fragments
+- **Fragment injection** — "Big difference." "Go figure." "Wild stuff."
+- **Rhetorical questions** — "Sound familiar?" "But why does this matter?"
+- **Length variation** — prevents 3+ similar-length sentences in a row
+- **Run-on sentences** — joins sentences with commas/conjunctions (very human)
+- **Sentence merging** — combines with em-dashes
 
-| Technique | What it does |
-|---|---|
-| Sentence splitting | Breaks long AI sentences into shorter fragments |
-| Fragment injection | Inserts short bursts: "Big difference." "Makes you think." |
-| Rhetorical questions | "But why does this matter?" breaks monotone rhythm |
-| Length variation | Forces swings between 3-word and 30-word sentences |
-| Sentence merging | Occasionally joins short sentences with em-dashes |
+### 3. Structural attacks — break AI patterns
 
-### Structural pattern attacks
+- **AI intro rewriting** — "In today's rapidly evolving world..." → completely rewritten
+- **Sentence opener diversification** — prevents repetitive The/This/It starts
+- **Sentence structure variation** — fronted adverbs, question forms, dash interrupters
+- **Passive→active voice** — "was implemented by teams" → "teams implemented"
+- **Paragraph structure breaking** — swaps sentence order, adds tangents
+- **Conjunction starters** — "And", "But", "So" at sentence start
+- **Clause reordering** — shuffles clause order
 
-| Technique | What it does |
-|---|---|
-| AI intro rewriting | "In today's rapidly evolving world..." → completely rewritten |
-| Personal voice | Adds "I think", "from what I've seen", first-person markers |
-| Passive → active | "was implemented by teams" → "teams implemented" |
-| Clause reordering | Shuffles clause order for less formulaic flow |
-| Conjunction starters | Begins sentences with "And", "But", "So" |
-| Self-corrections | "— well, not exactly" — humans rethink mid-sentence |
-| Parenthetical asides | "(which honestly makes sense)" — natural human noise |
+### 4. Voice injection — humans have personality
 
-### Human noise (perfect text = AI text)
+- **Personal voice** — "I think", "from what I've seen", "in my experience"
+- **Opinion markers** — "I'd say", "if you ask me", "personally"
+- **Hedging language** — "probably", "might be", "seems to be" (AI makes definitive claims)
+- **Self-corrections** — "— well, not exactly, but close"
+- **Parenthetical asides** — "(which honestly makes sense)", "(seriously)"
+- **Filler words** — "honestly", "basically", "tbh", "not gonna lie"
 
-| Technique | What it does |
-|---|---|
-| Realistic typos | Common misspellings + keyboard-neighbor swaps |
-| Homophone swaps | their/there, your/you're, then/than |
-| Punctuation errors | Dropped periods, extra commas, em-dashes |
-| Filler words | "honestly", "basically", "tbh" |
-| Word repetition | Accidental "the the" doubles |
+### 5. Grammar & noise — perfect text = AI text
 
-## Modes
-
-- **Paste text** — paste text, get humanized output with before/after statistics
-- **Upload .docx** — upload a Word document, download a humanized copy
+- **Grammar imperfections** — "whom"→"who", "one must"→"you gotta", "in which"→"where"
+- **45+ common typo** patterns + keyboard-neighbor swaps
+- **Homophone swaps** — their/there, your/you're, then/than, its/it's
+- **Punctuation errors** — dropped periods, extra commas, em-dashes, semicolons
+- **Word repetition** — accidental "the the" doubles
+- **Capitalization errors** — occasional lowercase sentence starts
 
 ## Quick start
 
@@ -65,7 +76,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Open **http://localhost:5000** in your browser.
+Open **http://localhost:5000**.
 
 ## Presets
 
@@ -74,7 +85,7 @@ Open **http://localhost:5000** in your browser.
 | Essay — Light | 25% | Light cleanup, keeps academic tone |
 | General — Balanced | 50% | Most use cases |
 | Turnitin Buster | 75% | Academic submissions |
-| Maximum Bypass | 90% | Maximum evasion, more casual output |
+| Maximum Bypass | 90% | Maximum evasion, casual output |
 
 ## API
 
@@ -102,7 +113,7 @@ Returns the humanized `.docx` file.
 
 ```
 ├── app.py              # Flask web server
-├── humanizer.py        # Core anti-detection engine (900+ lines)
+├── humanizer.py        # Core anti-detection engine (1500+ lines)
 ├── templates/
 │   └── index.html      # Single-page frontend with stats
 ├── requirements.txt

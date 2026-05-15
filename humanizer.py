@@ -955,7 +955,7 @@ def start_sentence_with_conjunction(sentence: str, intensity: float) -> str:
 
 def inject_personal_voice(sentence: str, intensity: float) -> str:
     """Prefix a sentence with a personal/opinionated phrase."""
-    if random.random() > intensity * 0.1:
+    if random.random() > intensity * 0.15:
         return sentence
 
     voice = random.choice(PERSONAL_VOICE_INSERTS)
@@ -1192,31 +1192,27 @@ def add_word_repetition(sentence: str, intensity: float) -> str:
 
 def restructure_paragraph(sentences: list[str], intensity: float) -> list[str]:
     """
-    Apply paragraph-level transforms:
-    - Inject fragments for burstiness
-    - Inject rhetorical questions
-    - Force sentence length variation
-    - Occasionally merge two short sentences
+    Apply paragraph-level transforms that attack burstiness and structure.
     """
+    sentences = diversify_sentence_openers(sentences, intensity)
+    sentences = break_paragraph_structure(sentences, intensity)
     sentences = inject_fragment(sentences, intensity)
+    sentences = add_sentence_fragments(sentences, intensity)
     sentences = inject_rhetorical_question(sentences, intensity)
     sentences = vary_sentence_lengths(sentences, intensity)
+    sentences = add_run_on_sentence(sentences, intensity)
 
     if len(sentences) >= 4 and random.random() < intensity * 0.15:
         merge_idx = random.randint(0, len(sentences) - 2)
         s1 = sentences[merge_idx].rstrip('.')
         s2 = sentences[merge_idx + 1]
         if len(s1.split()) + len(s2.split()) < 30:
-            merged = s1 + " — " + s2[0].lower() + s2[1:]
+            merged = s1 + " \u2014 " + s2[0].lower() + s2[1:]
             sentences[merge_idx] = merged
             sentences.pop(merge_idx + 1)
 
     return sentences
 
-
-# ═══════════════════════════════════════════════════════════════════════
-# 8. ANALYSIS / STATS
-# ═══════════════════════════════════════════════════════════════════════
 
 def compute_stats(text: str) -> dict:
     """Compute perplexity-like and burstiness metrics for display."""
@@ -1248,27 +1244,478 @@ def compute_stats(text: str) -> dict:
     }
 
 
+
+# ═══════════════════════════════════════════════════════════════════════
+# 9. SENTENCE OPENER DIVERSIFICATION
+#    AI starts 60%+ of sentences with "The", "This", "It", "These".
+#    Humans use far more varied openings.
+# ═══════════════════════════════════════════════════════════════════════
+
+OPENER_REWRITES = {
+    "The ": [
+        "This particular ", "One ", "A key ", "That ",
+        "Any ", "Each ", "Such a ", "What's notable about the ",
+    ],
+    "This ": [
+        "That ", "What we see here - this ", "One thing to note: this ",
+        "Now this ", "So this ",
+    ],
+    "It is ": [
+        "Turns out it's ", "Thing is, it's ", "Honestly it's ",
+        "You could say it's ", "I'd say it's ",
+    ],
+    "It has ": [
+        "It's ", "This has ", "Honestly it's ",
+    ],
+    "It was ": [
+        "Turned out it was ", "So it was ", "Ended up being ",
+    ],
+    "These ": [
+        "All these ", "Such ", "Those ",
+    ],
+    "There is ": [
+        "There's ", "You'll find ", "We've got ",
+    ],
+    "There are ": [
+        "There's ", "You'll find ", "We've got ", "You can see ",
+    ],
+}
+
+def diversify_sentence_openers(sentences: list[str], intensity: float) -> list[str]:
+    """
+    Track sentence openers across the paragraph and rewrite
+    when too many consecutive sentences start the same way.
+    """
+    if len(sentences) < 3:
+        return sentences
+
+    result = list(sentences)
+    recent_openers = []
+
+    for i, s in enumerate(result):
+        words = s.split()
+        if not words:
+            continue
+
+        opener = words[0]
+        recent_openers.append(opener.lower())
+        if len(recent_openers) > 4:
+            recent_openers.pop(0)
+
+        if len(recent_openers) >= 2:
+            same_count = sum(1 for o in recent_openers[-3:] if o == opener.lower())
+            if same_count >= 2 and random.random() < intensity * 0.7:
+                for prefix, alternatives in OPENER_REWRITES.items():
+                    if s.startswith(prefix):
+                        new_prefix = random.choice(alternatives)
+                        result[i] = new_prefix + s[len(prefix):]
+                        recent_openers[-1] = result[i].split()[0].lower()
+                        break
+                else:
+                    starters = [
+                        "Now, ", "See, ", "Look, ", "Right, so ",
+                        "Okay so ", "Honestly, ", "Basically, ",
+                        "What's worth noting: ", "Here's the thing - ",
+                    ]
+                    chosen = random.choice(starters)
+                    result[i] = chosen + s[0].lower() + s[1:]
+                    recent_openers[-1] = chosen.split()[0].lower()
+
+    return result
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 10. GRAMMAR IMPERFECTION SYSTEM
+#     Perfect grammar = AI. Humans make consistent, natural grammar
+#     mistakes that are NOT random — they follow patterns.
+# ═══════════════════════════════════════════════════════════════════════
+
+GRAMMAR_MISTAKES = [
+    # (pattern, replacement, description)
+    (r"\bwhom\b", "who", "whom→who"),
+    (r"\bwhomever\b", "whoever", "whomever→whoever"),
+    (r"\bhe or she\b", "they", "he or she→they"),
+    (r"\bhis or her\b", "their", "his or her→their"),
+    (r"\bone must\b", "you gotta", "one must→you gotta"),
+    (r"\bone should\b", "you should", "one should→you should"),
+    (r"\bone can\b", "you can", "one can→you can"),
+    (r"\bwith which\b", "that", "with which→that"),
+    (r"\bin which\b", "where", "in which→where"),
+    (r"\bfor which\b", "that", "for which→that"),
+    (r"\bupon which\b", "that", "upon which→that"),
+    (r"\bby which\b", "how", "by which→how"),
+    (r"\bto whom\b", "who", "to whom→who"),
+    (r"\bof which\b", "whose", "of which→whose"),
+]
+
+SUBJECT_VERB_DISAGREEMENTS = [
+    (r"\b(data) (are)\b", "data is"),
+    (r"\b(none) (are)\b", "none is"),
+    (r"\b(each) of (?:the |these |those )?(\w+) (has|have)\b", "each of the \\2 have"),
+    (r"\b(neither) .{3,20} (has)\b", None),  # skip complex
+]
+
+def break_grammar(sentence: str, intensity: float) -> str:
+    """Introduce natural grammar imperfections humans actually make."""
+    if random.random() > intensity * 0.35:
+        return sentence
+
+    for pattern, replacement, _ in GRAMMAR_MISTAKES:
+        if random.random() < 0.6:
+            sentence = re.sub(pattern, replacement, sentence, count=1, flags=re.IGNORECASE)
+
+    return sentence
+
+
+def add_run_on_sentence(sentences: list[str], intensity: float) -> list[str]:
+    """
+    Humans sometimes create run-on sentences by joining two thoughts
+    with a comma or no punctuation at all.
+    """
+    if len(sentences) < 4 or random.random() > intensity * 0.15:
+        return sentences
+
+    result = list(sentences)
+    idx = random.randint(0, len(result) - 2)
+    s1 = result[idx].rstrip('.!?')
+    s2 = result[idx + 1]
+
+    if len(s1.split()) + len(s2.split()) > 35:
+        return result
+
+    connector = random.choice([", ", " and ", " but ", ", also "])
+    merged = s1 + connector + s2[0].lower() + s2[1:]
+    result[idx] = merged
+    result.pop(idx + 1)
+
+    return result
+
+
+def add_sentence_fragments(sentences: list[str], intensity: float) -> list[str]:
+    """
+    Humans write incomplete sentences — fragments without a subject
+    or verb. "Pretty wild." "Not really." "Huge if true."
+    """
+    if len(sentences) < 3 or random.random() > intensity * 0.2:
+        return sentences
+
+    fragments = [
+        "Pretty wild.", "Not ideal.", "Huge difference.", "Worth thinking about.",
+        "Not always, though.", "Depends on context.", "Hard to say for sure.",
+        "Kind of a big deal.", "Tricky one.", "Fair enough.", "Not quite.",
+        "Which is interesting.", "Or not.", "Up to a point.", "To some extent.",
+        "At least in theory.", "More or less.", "Roughly speaking.",
+        "Give or take.", "In a sense.", "For now at least.",
+        "No joke.", "Dead serious.", "Not even close.", "Spot on.",
+        "Right on the money.", "Easy to overlook.", "A lot to unpack there.",
+        "Crazy, right?", "Wild stuff.", "Go figure.",
+    ]
+
+    result = list(sentences)
+    insert_count = 0
+    max_inserts = max(1, len(sentences) // 5)
+
+    for i in range(len(result) - 1, 0, -1):
+        if insert_count >= max_inserts:
+            break
+        if random.random() < intensity * 0.12:
+            result.insert(i, random.choice(fragments))
+            insert_count += 1
+
+    return result
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 11. SENTENCE STRUCTURE VARIATION
+#     AI uses Subject-Verb-Object pattern 80%+ of the time.
+#     Humans mix in many other structures.
+# ═══════════════════════════════════════════════════════════════════════
+
+def vary_sentence_structure(sentence: str, intensity: float) -> str:
+    """
+    Transform sentence structure away from the standard
+    Subject-Verb-Object that AI defaults to.
+    """
+    if random.random() > intensity * 0.2:
+        return sentence
+
+    words = sentence.split()
+    if len(words) < 6:
+        return sentence
+
+    transform = random.choice([
+        "fronted_adverb",
+        "question_form",
+        "emphasis_inversion",
+        "dash_interrupter",
+    ])
+
+    if transform == "fronted_adverb":
+        adverbs = ["Surprisingly,", "Interestingly,", "Oddly enough,",
+                   "Honestly,", "Clearly,", "Obviously,", "Weirdly,",
+                   "Funnily enough,", "Admittedly,", "Frankly,",
+                   "Curiously,", "Strangely,", "Notably,", "Arguably,"]
+        if not any(sentence.startswith(a) for a in adverbs):
+            chosen = random.choice(adverbs)
+            sentence = chosen + " " + sentence[0].lower() + sentence[1:]
+
+    elif transform == "question_form" and not sentence.endswith('?'):
+        words = sentence.split()
+        if len(words) > 5:
+            question_starters = [
+                "Isn't it true that", "Don't you think",
+                "Have you noticed how", "Ever notice how",
+                "You know what's funny?", "What if I told you",
+            ]
+            starter = random.choice(question_starters)
+            sentence = starter + " " + sentence[0].lower() + sentence[1:]
+            if sentence.endswith('.'):
+                sentence = sentence[:-1] + "?"
+
+    elif transform == "emphasis_inversion" and ',' in sentence:
+        parts = sentence.split(',', 1)
+        if len(parts) == 2 and len(parts[0].split()) >= 3 and len(parts[1].strip().split()) >= 3:
+            end_punct = ""
+            p1 = parts[1].strip()
+            if p1 and p1[-1] in '.!?':
+                end_punct = p1[-1]
+                p1 = p1[:-1]
+            sentence = p1[0].upper() + p1[1:] + " — " + parts[0][0].lower() + parts[0][1:] + end_punct
+
+    elif transform == "dash_interrupter":
+        words = sentence.split()
+        if len(words) >= 8:
+            mid = len(words) // 2
+            interrupters = [
+                "— and this is key —",
+                "— believe it or not —",
+                "— at least from what I can tell —",
+                "— this is important —",
+                "— and I mean this —",
+                "— worth mentioning —",
+                "— no surprise here —",
+                "— and yeah I know —",
+            ]
+            interrupter = random.choice(interrupters)
+            words.insert(mid, interrupter)
+            sentence = " ".join(words)
+
+    return sentence
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 12. PARAGRAPH STRUCTURE BREAKING
+#     AI follows: topic sentence → supporting evidence → conclusion
+#     Humans don't — they meander, digress, circle back.
+# ═══════════════════════════════════════════════════════════════════════
+
+def break_paragraph_structure(sentences: list[str], intensity: float) -> list[str]:
+    """
+    Disrupt the typical AI paragraph pattern by reordering,
+    adding tangents, and breaking the flow.
+    """
+    if len(sentences) < 4 or random.random() > intensity * 0.25:
+        return sentences
+
+    result = list(sentences)
+
+    action = random.choice(["swap_middle", "add_tangent", "start_with_detail"])
+
+    if action == "swap_middle" and len(result) >= 4:
+        i = random.randint(1, len(result) - 3)
+        j = random.randint(i + 1, min(i + 2, len(result) - 1))
+        result[i], result[j] = result[j], result[i]
+
+    elif action == "add_tangent":
+        tangents = [
+            "I know this is kind of a tangent but it's worth mentioning.",
+            "This is a bit off-topic but hear me out.",
+            "Side note -",
+            "Quick aside here.",
+            "And I know this sounds weird but stay with me.",
+            "Okay maybe I'm overthinking this but.",
+            "Random thought -",
+            "On a related note though.",
+        ]
+        pos = random.randint(1, max(1, len(result) - 1))
+        result.insert(pos, random.choice(tangents))
+
+    elif action == "start_with_detail" and len(result) >= 3:
+        if len(result[1].split()) < len(result[0].split()):
+            result[0], result[1] = result[1], result[0]
+
+    return result
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 13. ADVANCED COHERENCE BREAKING
+#     AI text is suspiciously smooth and coherent. Every sentence
+#     logically follows the previous one. Humans aren't like that.
+# ═══════════════════════════════════════════════════════════════════════
+
+def add_hedging_language(sentence: str, intensity: float) -> str:
+    """
+    Add hedging/uncertainty — humans qualify statements constantly.
+    AI makes definitive claims.
+    """
+    if random.random() > intensity * 0.15:
+        return sentence
+
+    hedges = [
+        ("is ", random.choice(["is probably ", "is likely ", "is arguably ",
+                               "might be ", "seems to be ", "could be "])),
+        ("are ", random.choice(["are probably ", "are likely ", "are arguably ",
+                               "might be ", "seem to be "])),
+        ("will ", random.choice(["will probably ", "will likely ", "might ",
+                                "could ", "should "])),
+        ("can ", random.choice(["can probably ", "can likely ", "might ",
+                               "could possibly "])),
+        ("has ", random.choice(["has probably ", "has likely ", "seems to have ",
+                               "apparently has "])),
+    ]
+
+    for pattern, replacement in hedges:
+        idx = sentence.lower().find(pattern)
+        if idx > 3 and random.random() < 0.4:
+            original_word = sentence[idx:idx + len(pattern)]
+            if original_word[0].isupper():
+                replacement = replacement[0].upper() + replacement[1:]
+            sentence = sentence[:idx] + replacement + sentence[idx + len(pattern):]
+            break
+
+    return sentence
+
+
+def add_opinion_markers(sentence: str, intensity: float) -> str:
+    """
+    Add opinion/subjective markers. AI speaks in objective facts.
+    Humans frame things as opinions.
+    """
+    if random.random() > intensity * 0.12:
+        return sentence
+
+    opinion_frames = [
+        "I'd say ",
+        "I feel like ",
+        "In my opinion, ",
+        "If you ask me, ",
+        "To me, ",
+        "From my perspective, ",
+        "As I see it, ",
+        "Personally, ",
+    ]
+
+    if not any(sentence.lower().startswith(o.lower()) for o in opinion_frames):
+        frame = random.choice(opinion_frames)
+        sentence = frame + sentence[0].lower() + sentence[1:]
+
+    return sentence
+
+
+INFORMAL_EXPRESSIONS = [
+    ("is very important", "is a pretty big deal"),
+    ("is extremely important", "really really matters"),
+    ("plays a significant role", "plays a huge part"),
+    ("has a significant impact", "has a real impact"),
+    ("a wide variety of", "all sorts of"),
+    ("a growing number of", "more and more"),
+    ("in recent years", "lately"),
+    ("it can be argued that", "you could say"),
+    ("it is widely believed that", "most people think"),
+    ("it has been demonstrated that", "it's been shown that"),
+    ("on the other hand", "then again"),
+    ("it is worth noting that", "worth pointing out -"),
+    ("it should be mentioned that", "gotta mention -"),
+    ("as a matter of fact", "actually"),
+    ("to a large extent", "pretty much"),
+    ("to a certain extent", "kind of"),
+    ("in the context of", "when it comes to"),
+    ("with regard to", "about"),
+    ("as a consequence", "because of that"),
+    ("in a manner that", "in a way that"),
+    ("a considerable amount of", "quite a bit of"),
+    ("for the most part", "mostly"),
+    ("in particular", "especially"),
+    ("as well as", "and also"),
+    ("in terms of", "when it comes to"),
+    ("is considered to be", "is basically"),
+    ("is generally considered", "most people consider it"),
+    ("is often regarded as", "people usually see it as"),
+    ("has been shown to", "turns out it"),
+    ("has been found to", "it seems to"),
+    ("according to recent studies", "recent research shows"),
+    ("according to experts", "experts say"),
+    ("has garnered attention", "has gotten attention"),
+    ("has gained traction", "has picked up steam"),
+    ("continues to evolve", "keeps changing"),
+    ("remains to be seen", "we'll have to wait and see"),
+    ("is subject to", "depends on"),
+    ("is contingent on", "depends on"),
+    ("lends credence to", "backs up"),
+    ("gives rise to", "leads to"),
+    ("takes into account", "considers"),
+    ("brings about", "causes"),
+    ("calls into question", "makes you question"),
+    ("sheds light on", "clears up"),
+    ("stands to reason", "makes sense"),
+    ("begs the question", "makes you wonder"),
+]
+
+def apply_informal_expressions(sentence: str, intensity: float) -> str:
+    """Replace stiff academic expressions with casual human versions."""
+    for formal, informal in INFORMAL_EXPRESSIONS:
+        if random.random() < intensity * 0.8:
+            pattern = re.compile(re.escape(formal), re.IGNORECASE)
+            match = pattern.search(sentence)
+            if match:
+                original = match.group()
+                replacement = informal
+                if original[0].isupper():
+                    replacement = replacement[0].upper() + replacement[1:]
+                sentence = pattern.sub(replacement, sentence, count=1)
+    return sentence
+
+
 # ═══════════════════════════════════════════════════════════════════════
 # 9. MAIN PIPELINE
 # ═══════════════════════════════════════════════════════════════════════
 
 def humanize_sentence(sentence: str, idx: int, intensity: float) -> str:
-    """Apply all sentence-level transforms in the optimal order."""
+    """
+    Apply all sentence-level transforms in carefully ordered stages.
+
+    Stage 1: Content-level changes (meaning preserving)
+    Stage 2: Structure changes (grammar/syntax)
+    Stage 3: Voice & personality injection
+    Stage 4: Surface noise (typos, punctuation, capitalization)
+    """
+    # Stage 1: Content — replace AI vocabulary and patterns
     s = rewrite_ai_intro_pattern(sentence, idx, intensity)
     s = swap_transitions(s)
     s = replace_formal_words(s, intensity)
+    s = apply_informal_expressions(s, intensity)
     s = boost_perplexity(s, intensity)
     s = apply_contractions(s, intensity)
+
+    # Stage 2: Structure — break AI sentence patterns
     s = convert_passive_to_active(s, intensity)
     s = break_long_sentence(s, intensity)
     s = shuffle_clause_order(s, intensity)
-    s = wrong_homophone(s, intensity)
-    s = inject_typos(s, intensity)
+    s = vary_sentence_structure(s, intensity)
+    s = break_grammar(s, intensity)
+
+    # Stage 3: Voice — inject human personality
+    s = add_hedging_language(s, intensity)
+    s = add_opinion_markers(s, intensity)
     s = start_sentence_with_conjunction(s, intensity)
     s = inject_personal_voice(s, intensity)
     s = add_filler(s, intensity)
     s = add_parenthetical(s, intensity)
     s = add_self_correction(s, intensity)
+
+    # Stage 4: Surface noise — human imperfections
+    s = wrong_homophone(s, intensity)
+    s = inject_typos(s, intensity)
     s = mess_up_punctuation(s, intensity)
     s = vary_capitalization(s, intensity)
     s = add_word_repetition(s, intensity)
