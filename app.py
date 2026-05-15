@@ -2,8 +2,8 @@
 Flask web application for the AI Text Humanizer.
 
 Supports:
-  - Paste plain text with typing simulator for Google Docs
-  - Upload a .docx file and download a cleaned, humanized .docx
+  - Paste plain text and get humanized output with before/after stats
+  - Upload a .docx file with editable metadata controls
 """
 
 import os
@@ -20,7 +20,6 @@ from flask import (
     send_file,
 )
 from docx import Document
-from docx.opc.constants import RELATIONSHIP_TYPE as RT
 
 from humanizer import humanize_text, humanize_text_with_stats
 
@@ -31,53 +30,67 @@ UPLOAD_DIR = os.path.join(tempfile.gettempdir(), "humanizer_uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
-def clean_docx_metadata(doc):
+def apply_metadata(doc, form_data):
     """
-    Strip metadata that reveals the document was machine-generated.
-
-    Google Docs and auditing extensions check:
-    - Application name (e.g. "python-docx")
-    - Creator / last modified by
-    - Revision count
-    - Creation / modification timestamps
-    - Custom properties
+    Apply user-specified metadata to the document.
+    Falls back to realistic random defaults if fields are empty.
     """
     props = doc.core_properties
 
-    props.author = ""
-    props.last_modified_by = ""
+    props.author = form_data.get("meta_author", "").strip()
+    props.last_modified_by = form_data.get("meta_last_modified_by", "").strip() or props.author
+    props.title = form_data.get("meta_title", "").strip()
+    props.subject = form_data.get("meta_subject", "").strip()
     props.comments = ""
     props.category = ""
-    props.subject = ""
     props.keywords = ""
     props.description = ""
     props.content_status = ""
     props.identifier = ""
-    props.language = "en-US"
+    props.language = form_data.get("meta_language", "en-US").strip() or "en-US"
     props.version = ""
 
-    now = datetime.utcnow()
-    writing_duration = timedelta(
-        hours=random.randint(1, 8),
-        minutes=random.randint(0, 59),
-    )
-    props.created = now - writing_duration
-    props.modified = now - timedelta(minutes=random.randint(1, 30))
+    rev_str = form_data.get("meta_revision", "").strip()
+    if rev_str:
+        try:
+            props.revision = max(1, int(rev_str))
+        except ValueError:
+            props.revision = random.randint(15, 80)
+    else:
+        props.revision = random.randint(15, 80)
 
-    props.revision = random.randint(15, 80)
+    created_str = form_data.get("meta_created", "").strip()
+    modified_str = form_data.get("meta_modified", "").strip()
+
+    now = datetime.utcnow()
+
+    if created_str:
+        try:
+            props.created = datetime.fromisoformat(created_str)
+        except (ValueError, TypeError):
+            props.created = now - timedelta(hours=random.randint(1, 72), minutes=random.randint(0, 59))
+    else:
+        props.created = now - timedelta(hours=random.randint(1, 72), minutes=random.randint(0, 59))
+
+    if modified_str:
+        try:
+            props.modified = datetime.fromisoformat(modified_str)
+        except (ValueError, TypeError):
+            props.modified = now - timedelta(minutes=random.randint(1, 30))
+    else:
+        props.modified = now - timedelta(minutes=random.randint(1, 30))
+
+    if props.modified and props.created and props.modified < props.created:
+        props.modified = props.created + timedelta(hours=random.randint(1, 8))
 
     return doc
 
 
 def strip_tracked_changes(doc):
-    """Remove any tracked changes / revision marks from the document."""
+    """Remove tracked changes / revision marks from the document."""
     try:
-        from lxml import etree
-        nsmap = {
-            'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
-        }
+        nsmap = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
         body = doc.element.body
-
         for tag in ['w:ins', 'w:del', 'w:rPrChange', 'w:pPrChange',
                     'w:sectPrChange', 'w:tblPrChange']:
             for elem in body.findall('.//' + tag, nsmap):
@@ -89,7 +102,6 @@ def strip_tracked_changes(doc):
                     parent.remove(elem)
     except Exception:
         pass
-
     return doc
 
 
@@ -155,7 +167,7 @@ def humanize_docx_api():
                             else:
                                 para.text = humanized
 
-        doc = clean_docx_metadata(doc)
+        doc = apply_metadata(doc, request.form)
         doc = strip_tracked_changes(doc)
 
         doc.save(output_path)
