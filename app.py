@@ -2,7 +2,7 @@
 Flask web application for the AI Text Humanizer.
 
 Supports:
-  - Paste plain text and get humanized output
+  - Paste plain text and get humanized output with before/after stats
   - Upload a .docx file and download a humanized .docx
 """
 
@@ -19,10 +19,10 @@ from flask import (
 )
 from docx import Document
 
-from humanizer import humanize_text
+from humanizer import humanize_text, humanize_text_with_stats
 
 app = Flask(__name__)
-app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16 MB
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 UPLOAD_DIR = os.path.join(tempfile.gettempdir(), "humanizer_uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -44,8 +44,8 @@ def humanize_text_api():
         return jsonify({"error": "Text is empty"}), 400
 
     intensity = float(data.get("intensity", 0.5))
-    result = humanize_text(text, intensity=intensity)
-    return jsonify({"result": result})
+    result = humanize_text_with_stats(text, intensity=intensity)
+    return jsonify(result)
 
 
 @app.route("/api/humanize-docx", methods=["POST"])
