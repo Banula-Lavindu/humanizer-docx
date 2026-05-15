@@ -348,9 +348,9 @@ def replace_formal_words(sentence: str, intensity: float) -> str:
     combined = {**FORMAL_TO_INFORMAL, **AI_GIVEAWAY_WORDS}
     for formal, informal in combined.items():
         if random.random() < intensity:
-            pattern = re.compile(re.escape(formal), re.IGNORECASE)
-            if pattern.search(sentence):
-                match = pattern.search(sentence)
+            pattern = re.compile(r'\b' + re.escape(formal) + r'\b', re.IGNORECASE)
+            match = pattern.search(sentence)
+            if match:
                 original = match.group()
                 replacement = informal
                 if original[0].isupper():
@@ -362,9 +362,9 @@ def replace_formal_words(sentence: str, intensity: float) -> str:
 def apply_contractions(sentence: str, intensity: float) -> str:
     for full, contracted in CONTRACTION_MAP.items():
         if random.random() < intensity:
-            pattern = re.compile(re.escape(full), re.IGNORECASE)
-            if pattern.search(sentence):
-                match = pattern.search(sentence)
+            pattern = re.compile(r'\b' + re.escape(full) + r'\b', re.IGNORECASE)
+            match = pattern.search(sentence)
+            if match:
                 original = match.group()
                 replacement = contracted
                 if original[0].isupper():
