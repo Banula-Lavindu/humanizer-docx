@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HumanizeAI — Make AI Text Undetectable</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #09090b; --surface: #18181b; --surface-2: #1e1e23; --surface-3: #27272a;
+      --border: #2e2e33; --border-hover: #3f3f46;
+      --primary: #7c3aed; --primary-light: #8b5cf6; --primary-glow: rgba(124,58,237,.15);
+      --primary-glow-s: rgba(124,58,237,.3);
+      --accent: #06b6d4; --accent-glow: rgba(6,182,212,.12);
+      --green: #10b981; --green-glow: rgba(16,185,129,.12);
+      --orange: #f59e0b; --orange-glow: rgba(245,158,11,.12);
+      --red: #ef4444; --red-glow: rgba(239,68,68,.12);
+      --text: #fafafa; --text-2: #a1a1aa; --text-m: #71717a;
+      --r: 12px; --r-lg: 16px; --r-sm: 8px; --r-xs: 6px;
+      --tr: .2s cubic-bezier(.4,0,.2,1);
+    }
+    body { font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.6; -webkit-font-smoothing:antialiased; }
+    .app { max-width:920px; margin:0 auto; padding:0 1.25rem; }
+
+    /* Top bar */
+    .topbar { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 0; border-bottom:1px solid var(--border); margin-bottom:2rem; }
+    .logo { font-size:1.35rem; font-weight:800; background:linear-gradient(135deg,var(--primary-light),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:-.03em; }
+    .topbar-badges { display:flex; gap:.35rem; flex-wrap:wrap; justify-content:flex-end; }
+    .tbadge { font-size:.65rem; font-weight:600; padding:.2rem .55rem; border-radius:99px; background:var(--surface-2); color:var(--text-m); border:1px solid var(--border); white-space:nowrap; }
+
+    /* Nav */
+    .nav { display:flex; background:var(--surface); border-radius:var(--r); padding:4px; gap:4px; margin-bottom:1.75rem; border:1px solid var(--border); }
+    .nav-btn { flex:1; padding:.75rem .5rem; border:none; border-radius:var(--r-sm); background:transparent; color:var(--text-m); font-family:inherit; font-size:.9rem; font-weight:600; cursor:pointer; transition:var(--tr); display:flex; align-items:center; justify-content:center; gap:.45rem; }
+    .nav-btn:hover { color:var(--text-2); background:var(--surface-2); }
+    .nav-btn.active { background:var(--primary); color:#fff; box-shadow:0 2px 8px var(--primary-glow-s); }
+    .nav-btn svg { width:16px; height:16px; flex-shrink:0; }
+    .view { display:none; animation:fadeIn .25s ease; }
+    .view.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+    /* Card */
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:1.5rem; margin-bottom:1rem; transition:border-color var(--tr); }
+    .card:hover { border-color:var(--border-hover); }
+    .card-title { font-size:.95rem; font-weight:700; margin-bottom:.75rem; display:flex; align-items:center; gap:.5rem; }
+    .card-title .step { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:var(--primary); color:#fff; font-size:.7rem; font-weight:700; flex-shrink:0; }
+
+    /* Textarea */
+    textarea { width:100%; min-height:160px; padding:.875rem 1rem; border:1px solid var(--border); border-radius:var(--r-sm); background:var(--bg); color:var(--text); font-family:inherit; font-size:.9rem; line-height:1.7; resize:vertical; transition:border-color var(--tr),box-shadow var(--tr); }
+    textarea:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); }
+    textarea::placeholder { color:var(--text-m); }
+
+    /* Form inputs */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-top:.5rem; }
+    .form-group { display:flex; flex-direction:column; gap:.3rem; }
+    .form-group label { font-size:.78rem; font-weight:600; color:var(--text-2); }
+    .form-group input, .form-group select {
+      padding:.5rem .7rem; background:var(--bg); border:1px solid var(--border);
+      border-radius:var(--r-xs); color:var(--text); font-family:inherit; font-size:.85rem;
+      transition:border-color var(--tr), box-shadow var(--tr);
+    }
+    .form-group input:focus, .form-group select:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); }
+    .form-group input::placeholder { color:var(--text-m); }
+    .form-hint { font-size:.7rem; color:var(--text-m); margin-top:.15rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    /* Controls */
+    .controls { display:flex; align-items:center; gap:.75rem; margin:1rem 0; flex-wrap:wrap; }
+    .slider-wrap { flex:1; min-width:150px; }
+    .slider-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:.35rem; }
+    .slider-top label { font-size:.82rem; font-weight:600; color:var(--text-2); margin:0; }
+    .slider-val { font-size:.82rem; font-weight:700; color:var(--primary-light); min-width:2rem; text-align:right; }
+    input[type="range"] { -webkit-appearance:none; width:100%; height:5px; background:var(--surface-3); border-radius:3px; outline:none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--primary-light); cursor:pointer; box-shadow:0 0 8px var(--primary-glow-s); transition:transform var(--tr); }
+    input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
+    input[type="range"]::-moz-range-thumb { width:18px;height:18px;border-radius:50%;background:var(--primary-light);cursor:pointer;border:none; }
+
+    /* Chips */
+    .presets { display:flex; gap:.4rem; flex-wrap:wrap; }
+    .chip { padding:.35rem .75rem; border:1px solid var(--border); border-radius:99px; background:var(--surface-2); color:var(--text-m); font-family:inherit; font-size:.75rem; font-weight:600; cursor:pointer; transition:var(--tr); white-space:nowrap; }
+    .chip:hover { border-color:var(--primary); color:var(--text-2); }
+    .chip.active { border-color:var(--primary-light); color:var(--primary-light); background:var(--primary-glow); }
+
+    /* Buttons */
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:.45rem; padding:.7rem 1.5rem; border:none; border-radius:var(--r-sm); font-family:inherit; font-size:.88rem; font-weight:700; cursor:pointer; transition:var(--tr); }
+    .btn-primary { background:var(--primary); color:#fff; width:100%; padding:.85rem; }
+    .btn-primary:hover { background:var(--primary-light); box-shadow:0 4px 16px var(--primary-glow-s); }
+    .btn-primary:active { transform:scale(.98); }
+    .btn-primary:disabled { opacity:.4; cursor:not-allowed; pointer-events:none; }
+    .btn-sm { padding:.45rem .85rem; font-size:.78rem; font-weight:600; border:1px solid var(--border); background:var(--surface-2); color:var(--text-2); border-radius:var(--r-xs); }
+    .btn-sm:hover { border-color:var(--primary); color:var(--text); }
+
+    /* Spinner */
+    .spinner { display:none; width:18px;height:18px; border:2.5px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .loading .spinner { display:inline-block; }
+    .loading .btn-label { display:none; }
+
+    /* Toast */
+    .toast { padding:.65rem 1rem; border-radius:var(--r-sm); font-size:.82rem; font-weight:500; margin-top:.75rem; display:none; animation:slideIn .2s ease; }
+    @keyframes slideIn { from{opacity:0;transform:translateY(-4px)} }
+    .toast.error { display:block; background:var(--red-glow); border:1px solid rgba(239,68,68,.2); color:var(--red); }
+    .toast.success { display:block; background:var(--green-glow); border:1px solid rgba(16,185,129,.2); color:var(--green); }
+
+    /* Result */
+    .result { display:none; animation:fadeIn .3s ease; }
+    .result.visible { display:block; }
+    .result-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem; flex-wrap:wrap; gap:.5rem; }
+    .result-bar h3 { font-size:.9rem; font-weight:700; }
+    .result-actions { display:flex; gap:.35rem; }
+
+    /* Gauges */
+    .gauges { display:none; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:.6rem; margin-bottom:1rem; }
+    .gauges.visible { display:grid; }
+    .gauge { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm); padding:.85rem; text-align:center; }
+    .gauge-label { font-size:.68rem; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-m); margin-bottom:.4rem; }
+    .gauge-bar { height:5px; background:var(--surface-3); border-radius:3px; margin:.5rem 0 .25rem; overflow:hidden; }
+    .gauge-fill { height:100%; border-radius:3px; transition:width .6s ease; }
+    .gauge-values { display:flex; justify-content:space-between; font-size:.7rem; }
+    .gauge-before { color:var(--red); font-weight:600; }
+    .gauge-after { color:var(--green); font-weight:700; }
+
+    /* File drop */
+    .drop-zone { border:2px dashed var(--border); border-radius:var(--r); padding:2.5rem 1.5rem; text-align:center; cursor:pointer; transition:var(--tr); position:relative; }
+    .drop-zone:hover,.drop-zone.dragover { border-color:var(--primary); background:var(--primary-glow); }
+    .drop-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+    .drop-zone .drop-icon { font-size:2rem; margin-bottom:.5rem; }
+    .drop-zone p { color:var(--text-m); font-size:.88rem; }
+    .drop-zone .file-name { margin-top:.5rem; color:var(--accent); font-weight:700; font-size:.9rem; }
+
+    /* Metadata section */
+    .meta-section { margin-top:1.25rem; }
+    .meta-toggle { display:flex; align-items:center; gap:.5rem; cursor:pointer; padding:.5rem 0; user-select:none; }
+    .meta-toggle h4 { font-size:.88rem; font-weight:700; color:var(--text-2); }
+    .meta-toggle .arrow { font-size:.75rem; color:var(--text-m); transition:transform var(--tr); }
+    .meta-toggle.open .arrow { transform:rotate(90deg); }
+    .meta-body { display:none; padding-top:.5rem; }
+    .meta-body.open { display:block; animation:fadeIn .2s ease; }
+    .meta-info { font-size:.78rem; color:var(--text-m); margin-bottom:.75rem; line-height:1.5; }
+
+    /* Footer */
+    .footer { text-align:center; color:var(--text-m); font-size:.72rem; padding:2.5rem 0 2rem; border-top:1px solid var(--border); margin-top:3rem; }
+
+    @media(max-width:640px) {
+      .topbar { flex-direction:column; gap:.75rem; align-items:flex-start; }
+      .topbar-badges { justify-content:flex-start; }
+      .nav-btn { font-size:.8rem; padding:.65rem .35rem; }
+      .nav-btn svg { display:none; }
+      .gauges.visible { grid-template-columns:repeat(2,1fr); }
+      .form-grid { grid-template-columns:1fr; }
+      .result-bar { flex-direction:column; align-items:flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="logo">HumanizeAI</div>
+    <div class="topbar-badges">
+      <span class="tbadge">Turnitin</span>
+      <span class="tbadge">GPTZero</span>
+      <span class="tbadge">Originality.ai</span>
+      <span class="tbadge">Copyleaks</span>
+      <span class="tbadge">ZeroGPT</span>
+      <span class="tbadge">Google Docs</span>
+    </div>
+  </div>
+
+  <nav class="nav" role="tablist" aria-label="Main navigation">
+    <button class="nav-btn active" data-view="humanize" role="tab" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg>
+      Humanize Text
+    </button>
+    <button class="nav-btn" data-view="docx" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Upload .docx
+    </button>
+  </nav>
+
+  <!-- ═══ HUMANIZE VIEW ═══ -->
+  <div id="v-humanize" class="view active" role="tabpanel">
+    <div class="card">
+      <div class="card-title"><span class="step">1</span> Paste your AI-generated text</div>
+      <textarea id="input-text" placeholder="Paste text from ChatGPT, Claude, Gemini, or any AI..." aria-label="Input text"></textarea>
+      <div class="controls">
+        <div class="slider-wrap">
+          <div class="slider-top">
+            <label>Intensity</label>
+            <span class="slider-val" id="intensity-val">50%</span>
+          </div>
+          <input type="range" id="intensity" min="0" max="100" value="50" aria-label="Humanization intensity">
+        </div>
+      </div>
+      <div class="presets">
+        <button class="chip" data-val="25">Light</button>
+        <button class="chip active" data-val="50">Balanced</button>
+        <button class="chip" data-val="75">Turnitin Buster</button>
+        <button class="chip" data-val="90">Max Bypass</button>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="humanize-btn" aria-label="Humanize text">
+      <span class="btn-label">Humanize Text</span>
+      <div class="spinner"></div>
+    </button>
+    <div class="toast" id="text-toast"></div>
+
+    <div class="gauges" id="gauges" style="margin-top:1rem"></div>
+
+    <div class="result" id="result-area">
+      <div class="card">
+        <div class="result-bar">
+          <div class="card-title" style="margin-bottom:0"><span class="step">2</span> Humanized output</div>
+          <div class="result-actions">
+            <button class="btn btn-sm" id="reroll-btn">Re-roll</button>
+            <button class="btn btn-sm" id="copy-btn">Copy all</button>
+          </div>
+        </div>
+        <textarea id="output-text" readonly aria-label="Humanized output"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DOCX VIEW ═══ -->
+  <div id="v-docx" class="view" role="tabpanel">
+
+    <!-- Upload -->
+    <div class="card">
+      <div class="card-title"><span class="step">1</span> Upload your .docx file</div>
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="docx-input" accept=".docx" aria-label="Upload docx file">
+        <div class="drop-icon">&#128196;</div>
+        <p>Drag & drop a <strong>.docx</strong> file or click to browse</p>
+        <div class="file-name" id="file-name"></div>
+      </div>
+    </div>
+
+    <!-- Intensity -->
+    <div class="card">
+      <div class="card-title"><span class="step">2</span> Text humanization</div>
+      <div class="controls" style="margin-top:0">
+        <div class="slider-wrap">
+          <div class="slider-top">
+            <label>Intensity</label>
+            <span class="slider-val" id="docx-intensity-val">50%</span>
+          </div>
+          <input type="range" id="docx-intensity" min="0" max="100" value="50" aria-label="Docx humanization intensity">
+        </div>
+      </div>
+    </div>
+
+    <!-- Metadata editor -->
+    <div class="card">
+      <div class="card-title"><span class="step">3</span> Document metadata</div>
+      <p class="meta-info">
+        Google Docs and audit tools read document properties to verify authenticity.
+        Customize these fields or leave blank for realistic auto-generated values.
+      </p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="meta-author">Author</label>
+          <input type="text" id="meta-author" placeholder="e.g. John Smith">
+          <span class="form-hint">Leave blank to clear</span>
+        </div>
+        <div class="form-group">
+          <label for="meta-modified-by">Last Modified By</label>
+          <input type="text" id="meta-modified-by" placeholder="Same as author if blank">
+        </div>
+        <div class="form-group">
+          <label for="meta-title">Document Title</label>
+          <input type="text" id="meta-title" placeholder="e.g. Research Paper Draft">
+        </div>
+        <div class="form-group">
+          <label for="meta-subject">Subject</label>
+          <input type="text" id="meta-subject" placeholder="e.g. Computer Science">
+        </div>
+        <div class="form-group">
+          <label for="meta-revision">Revision Count</label>
+          <input type="number" id="meta-revision" placeholder="Auto (15-80)" min="1" max="999">
+          <span class="form-hint">Higher = looks more edited</span>
+        </div>
+        <div class="form-group">
+          <label for="meta-language">Language</label>
+          <select id="meta-language">
+            <option value="en-US">English (US)</option>
+            <option value="en-GB">English (UK)</option>
+            <option value="es-ES">Spanish</option>
+            <option value="fr-FR">French</option>
+            <option value="de-DE">German</option>
+            <option value="pt-BR">Portuguese (BR)</option>
+            <option value="ja-JP">Japanese</option>
+            <option value="zh-CN">Chinese (Simplified)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="meta-created">Created Date</label>
+          <input type="datetime-local" id="meta-created">
+          <span class="form-hint">Auto if blank (1-72h ago)</span>
+        </div>
+        <div class="form-group">
+          <label for="meta-modified">Modified Date</label>
+          <input type="datetime-local" id="meta-modified">
+          <span class="form-hint">Auto if blank (recent)</span>
+        </div>
+      </div>
+
+      <!-- Advanced options -->
+      <div class="meta-section">
+        <div class="meta-toggle" id="adv-toggle">
+          <span class="arrow">&#9654;</span>
+          <h4>Auto-clean options</h4>
+        </div>
+        <div class="meta-body" id="adv-body">
+          <div class="form-grid" style="margin-top:.5rem">
+            <div class="form-group full">
+              <label>These fields are always cleaned automatically:</label>
+              <p class="meta-info" style="margin:0">
+                <strong>Comments</strong>, <strong>Keywords</strong>, <strong>Description</strong>,
+                <strong>Category</strong>, <strong>Content Status</strong>, <strong>Identifier</strong>,
+                <strong>Version</strong> — all cleared to remove any AI-tool fingerprints.
+                <br><strong>Tracked Changes</strong> and <strong>Revision Marks</strong> are stripped from the document body.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Download button -->
+    <button class="btn btn-primary" id="docx-btn" disabled>
+      <span class="btn-label">Humanize & Download</span>
+      <div class="spinner"></div>
+    </button>
+    <div class="toast" id="docx-toast"></div>
+  </div>
+
+  <div class="footer">HumanizeAI — Defeats Turnitin, GPTZero, Originality.ai, Copyleaks, ZeroGPT, Google Docs audit</div>
+</div>
+
+<script>
+// Nav
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+    document.getElementById('v-'+btn.dataset.view).classList.add('active');
+  });
+});
+
+// Slider
+const sl = document.getElementById('intensity'), sv = document.getElementById('intensity-val');
+sl.addEventListener('input', () => {
+  sv.textContent = sl.value+'%';
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', parseInt(c.dataset.val)===parseInt(sl.value)));
+});
+const ds = document.getElementById('docx-intensity'), dv = document.getElementById('docx-intensity-val');
+ds.addEventListener('input', () => { dv.textContent = ds.value+'%'; });
+
+// Presets
+document.querySelectorAll('.chip').forEach(c => {
+  c.addEventListener('click', () => {
+    sl.value = c.dataset.val; sv.textContent = c.dataset.val+'%';
+    document.querySelectorAll('.chip').forEach(x => x.classList.remove('active')); c.classList.add('active');
+  });
+});
+
+// Advanced toggle
+document.getElementById('adv-toggle').addEventListener('click', function() {
+  this.classList.toggle('open');
+  document.getElementById('adv-body').classList.toggle('open');
+});
+
+// Gauges
+function renderGauges(before, after) {
+  const g = document.getElementById('gauges');
+  const m = [
+    {l:'Burstiness',k:'burstiness',max:12,hi:true},{l:'Vocab Richness',k:'vocab_richness',max:1,hi:true},
+    {l:'Avg Words/Sent',k:'avg_words_per_sentence',max:30,hi:false},{l:'Shortest',k:'shortest_sentence',max:20,hi:false},
+    {l:'Longest',k:'longest_sentence',max:40,hi:true},{l:'Sentences',k:'sentence_count',max:30,hi:true},
+  ];
+  g.innerHTML = m.map(x => {
+    const bv=before[x.k]||0, av=after[x.k]||0, pct=Math.min(100,(av/x.max)*100);
+    const col = (x.hi?av>bv:av<bv)?'var(--green)':'var(--orange)';
+    return `<div class="gauge"><div class="gauge-label">${x.l}</div><div class="gauge-bar"><div class="gauge-fill" style="width:${pct}%;background:${col}"></div></div><div class="gauge-values"><span class="gauge-before">${bv}</span><span class="gauge-after">${av}</span></div></div>`;
+  }).join('');
+  g.classList.add('visible');
+}
+
+// Humanize
+async function doHumanize() {
+  const text = document.getElementById('input-text').value.trim();
+  const toast = document.getElementById('text-toast');
+  toast.className = 'toast';
+  if (!text) { toast.className='toast error'; toast.textContent='Paste some text first.'; return; }
+  const btn = document.getElementById('humanize-btn');
+  btn.classList.add('loading'); btn.disabled=true;
+  try {
+    const res = await fetch('/api/humanize-text',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,intensity:sl.value/100})});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    document.getElementById('output-text').value = data.result;
+    document.getElementById('result-area').classList.add('visible');
+    renderGauges(data.before, data.after);
+  } catch(e) { toast.className='toast error'; toast.textContent=e.message; }
+  finally { btn.classList.remove('loading'); btn.disabled=false; }
+}
+document.getElementById('humanize-btn').addEventListener('click', doHumanize);
+document.getElementById('reroll-btn').addEventListener('click', doHumanize);
+
+// Copy
+document.getElementById('copy-btn').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.getElementById('output-text').value).then(() => {
+    const b=document.getElementById('copy-btn'); b.textContent='Copied!'; setTimeout(()=>b.textContent='Copy all',1500);
+  });
+});
+
+// File upload
+const fi=document.getElementById('docx-input'), dz=document.getElementById('drop-zone'), fn=document.getElementById('file-name'), db=document.getElementById('docx-btn');
+fi.addEventListener('change', () => { if(fi.files.length){fn.textContent=fi.files[0].name;db.disabled=false;} });
+dz.addEventListener('dragover', e=>{e.preventDefault();dz.classList.add('dragover');});
+dz.addEventListener('dragleave', ()=>dz.classList.remove('dragover'));
+dz.addEventListener('drop', e=>{e.preventDefault();dz.classList.remove('dragover');if(e.dataTransfer.files.length){fi.files=e.dataTransfer.files;fn.textContent=e.dataTransfer.files[0].name;db.disabled=false;}});
+
+// Docx upload with metadata
+db.addEventListener('click', async () => {
+  const toast=document.getElementById('docx-toast');
+  toast.className='toast';
+  if(!fi.files.length) return;
+  const fd=new FormData();
+  fd.append('file', fi.files[0]);
+  fd.append('intensity', ds.value/100);
+  fd.append('meta_author', document.getElementById('meta-author').value);
+  fd.append('meta_last_modified_by', document.getElementById('meta-modified-by').value);
+  fd.append('meta_title', document.getElementById('meta-title').value);
+  fd.append('meta_subject', document.getElementById('meta-subject').value);
+  fd.append('meta_revision', document.getElementById('meta-revision').value);
+  fd.append('meta_language', document.getElementById('meta-language').value);
+  fd.append('meta_created', document.getElementById('meta-created').value);
+  fd.append('meta_modified', document.getElementById('meta-modified').value);
+
+  db.classList.add('loading'); db.disabled=true;
+  try {
+    const res = await fetch('/api/humanize-docx',{method:'POST',body:fd});
+    if(!res.ok){const d=await res.json();throw new Error(d.error);}
+    const blob=await res.blob(), a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=fi.files[0].name.replace('.docx','')+'_humanized.docx';
+    document.body.appendChild(a);a.click();a.remove();
+    toast.className='toast success';
+    toast.textContent='Downloaded — text humanized, metadata set, tracked changes removed.';
+  } catch(e){toast.className='toast error';toast.textContent=e.message;}
+  finally{db.classList.remove('loading');db.disabled=false;}
+});
+</script>
+</body>
+</html>
