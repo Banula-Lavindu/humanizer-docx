@@ -315,6 +315,37 @@ AI_GIVEAWAY_WORDS = {
     "considerable attention": "a lot of attention",
     "profound impact": "huge effect",
     "substantial impact": "big effect",
+    "unprecedented": "never-before-seen",
+    "unprecedented advancements": "huge leaps",
+    "unprecedented changes": "major changes",
+    "at an unprecedented pace": "faster than ever",
+    "at an unprecedented rate": "super fast",
+    "significantly improved": "gotten a lot better",
+    "significantly impacted": "really affected",
+    "significantly increased": "gone way up",
+    "increasingly becoming": "more and more becoming",
+    "increasingly important": "getting more important",
+    "increasingly popular": "getting more popular",
+    "a wide range of": "all sorts of",
+    "wide range of": "bunch of",
+    "plays a key role": "matters a lot",
+    "play a key role": "matter a lot",
+    "plays an important role": "really matters",
+    "a critical role": "a big part",
+    "ethical implications": "ethical issues",
+    "ethical considerations": "ethical stuff",
+    "raises concerns about": "brings up worries about",
+    "raises questions about": "makes you wonder about",
+    "it is crucial that": "it really matters that",
+    "responsible development": "careful development",
+    "proper governance": "good oversight",
+    "is essential for": "is key for",
+    "is vital for": "really matters for",
+    "capable of": "able to",
+    "global problems": "world problems",
+    "complex problems": "tough problems",
+    "driven by": "pushed by",
+    "fueled by": "powered by",
 }
 
 # --- Perplexity boosters: uncommon but natural synonym swaps ---
@@ -1659,13 +1690,54 @@ INFORMAL_EXPRESSIONS = [
     ("sheds light on", "clears up"),
     ("stands to reason", "makes sense"),
     ("begs the question", "makes you wonder"),
+    ("despite its advantages", "sure it has its upsides but"),
+    ("despite the advantages", "yeah there are benefits but"),
+    ("despite these advantages", "benefits aside though"),
+    ("despite its benefits", "sure it helps but"),
+    ("raises concerns about", "makes people worry about"),
+    ("at an unprecedented pace", "way faster than before"),
+    ("at a rapid pace", "really quickly"),
+    ("is transforming", "is changing"),
+    ("are transforming", "are changing"),
+    ("has transformed", "has changed"),
+    ("have transformed", "have changed"),
+    ("responsible AI development", "building AI the right way"),
+    ("responsible development", "building stuff carefully"),
+    ("requires transparency", "needs to be transparent"),
+    ("everyday life", "day to day life"),
+    ("daily lives", "day to day lives"),
+    ("industries, societies, and", "industries and even"),
+    ("healthcare and education", "healthcare, education"),
+    ("from healthcare to", "from like healthcare to"),
+    ("advanced robotics", "better robots"),
+    ("autonomous transportation", "self-driving cars"),
+    ("medical breakthroughs", "medical advances"),
+    ("artificial intelligence (AI)", "AI"),
+    ("Artificial Intelligence (AI)", "AI"),
+    ("artificial intelligence(AI)", "AI"),
+    ("user convenience", "things easier for people"),
+    ("user experience", "how things feel to use"),
+    ("user experiences", "how things feel to use"),
+    ("personalized user", "personal"),
+    ("decision-making", "making decisions"),
+    ("voice recognition", "voice commands"),
+    ("predictive text", "autocomplete"),
+    ("customer support", "helping customers"),
+    ("fraud detection", "catching fraud"),
+    ("data analytics", "looking at data"),
+    ("strategic decision", "big decisions"),
+    ("identify patterns", "spot trends"),
+    ("boost operations", "run things better"),
+    ("proper governance", "good management"),
 ]
 
 def apply_informal_expressions(sentence: str, intensity: float) -> str:
     """Replace stiff academic expressions with casual human versions."""
-    for formal, informal in INFORMAL_EXPRESSIONS:
-        if random.random() < intensity * 0.8:
-            pattern = re.compile(re.escape(formal), re.IGNORECASE)
+    # Sort by length (longest first) to prevent partial matches
+    sorted_exprs = sorted(INFORMAL_EXPRESSIONS, key=lambda x: len(x[0]), reverse=True)
+    for formal, informal in sorted_exprs:
+        if random.random() < intensity * 0.75:
+            pattern = re.compile(r'\b' + re.escape(formal) + r'\b', re.IGNORECASE)
             match = pattern.search(sentence)
             if match:
                 original = match.group()
@@ -1674,6 +1746,99 @@ def apply_informal_expressions(sentence: str, intensity: float) -> str:
                     replacement = replacement[0].upper() + replacement[1:]
                 sentence = pattern.sub(replacement, sentence, count=1)
     return sentence
+
+
+def break_list_pattern(sentence: str, intensity: float) -> str:
+    """
+    Break comma-separated lists which are a top AI detection signal.
+    'privacy, bias, job displacement, and ethical decision-making'
+    → split into separate thoughts or rephrase.
+    """
+    if random.random() > intensity * 0.5:
+        return sentence
+
+    # Find lists: 3+ items separated by commas with 'and' before last
+    list_pattern = re.compile(
+        r'(\b\w+(?:\s+\w+){0,3}),\s+'
+        r'(\w+(?:\s+\w+){0,3}),\s+'
+        r'(?:and\s+)?(\w+(?:\s+\w+){0,3})'
+        r'(?:,\s+(?:and\s+)?(\w+(?:\s+\w+){0,3}))?',
+        re.IGNORECASE
+    )
+
+    match = list_pattern.search(sentence)
+    if not match:
+        return sentence
+
+    items = [g for g in match.groups() if g]
+    if len(items) < 3:
+        return sentence
+
+    strategy = random.choice(["split", "reduce", "conversational", "pair"])
+
+    if strategy == "split" and len(items) >= 3:
+        first_two = items[0] + " and " + items[1]
+        rest = " and ".join(items[2:])
+        connector = random.choice([
+            ". And also ", ". Not to mention ", ". Plus ", ". Oh and also ",
+            ". Then there\'s also ", ". Same goes for ",
+        ])
+        replacement = first_two + connector + rest
+        sentence = sentence[:match.start()] + replacement + sentence[match.end():]
+
+    elif strategy == "reduce":
+        kept = random.sample(items, min(2, len(items)))
+        joiner = random.choice([" and ", " plus ", " along with "])
+        extras = random.choice([
+            " and stuff like that",
+            " among other things",
+            " and so on",
+            " etc",
+            " and more",
+            " basically",
+        ])
+        replacement = joiner.join(kept) + extras
+        sentence = sentence[:match.start()] + replacement + sentence[match.end():]
+
+    elif strategy == "conversational":
+        replacement = items[0] + " for one"
+        if len(items) > 1:
+            replacement += ", but also " + items[1]
+        if len(items) > 2:
+            replacement += " — and honestly " + items[2] + " too"
+        sentence = sentence[:match.start()] + replacement + sentence[match.end():]
+
+    elif strategy == "pair":
+        replacement = items[0] + " and " + items[1]
+        if len(items) > 2:
+            replacement += ". " + items[2][0].upper() + items[2][1:] + " is another big one"
+        sentence = sentence[:match.start()] + replacement + sentence[match.end():]
+
+    return sentence
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 15. INJECTION RATE LIMITER
+#     Too many parentheticals/fillers in one sentence looks WORSE
+#     than the original. Limit to 1 injection per sentence max.
+# ═══════════════════════════════════════════════════════════════════════
+
+_injection_markers = [
+    "(", "—", "honestly", "basically", "I think", "I mean", "tbh",
+    "you know", "kind of", "sort of", "actually", "really", "just",
+    "not gonna lie", "real talk", "here\'s the thing", "if you ask me",
+    "to be fair", "in my experience", "I\'d say", "truth is", "fact is",
+    "thing is", "point is", "from what I\'ve seen",
+]
+
+def count_injections(sentence: str) -> int:
+    """Count how many filler/parenthetical injections are in a sentence."""
+    count = 0
+    lower = sentence.lower()
+    for marker in _injection_markers:
+        if marker.lower() in lower:
+            count += 1
+    return count
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -1700,18 +1865,30 @@ def humanize_sentence(sentence: str, idx: int, intensity: float) -> str:
     # Stage 2: Structure — break AI sentence patterns
     s = convert_passive_to_active(s, intensity)
     s = break_long_sentence(s, intensity)
+    s = break_list_pattern(s, intensity)
     s = shuffle_clause_order(s, intensity)
     s = vary_sentence_structure(s, intensity)
     s = break_grammar(s, intensity)
 
-    # Stage 3: Voice — inject human personality
-    s = add_hedging_language(s, intensity)
-    s = add_opinion_markers(s, intensity)
-    s = start_sentence_with_conjunction(s, intensity)
-    s = inject_personal_voice(s, intensity)
-    s = add_filler(s, intensity)
-    s = add_parenthetical(s, intensity)
-    s = add_self_correction(s, intensity)
+    # Stage 3: Voice — inject human personality (rate-limited)
+    # Only inject if sentence doesn't already have injections
+    injections = count_injections(s)
+    if injections < 1:
+        action = random.choice(["hedge", "opinion", "conjunction", "voice", "filler", "aside", "correct", "none"])
+        if action == "hedge":
+            s = add_hedging_language(s, intensity)
+        elif action == "opinion":
+            s = add_opinion_markers(s, intensity)
+        elif action == "conjunction":
+            s = start_sentence_with_conjunction(s, intensity)
+        elif action == "voice":
+            s = inject_personal_voice(s, intensity)
+        elif action == "filler":
+            s = add_filler(s, intensity)
+        elif action == "aside":
+            s = add_parenthetical(s, intensity)
+        elif action == "correct":
+            s = add_self_correction(s, intensity)
 
     # Stage 4: Surface noise — human imperfections
     s = wrong_homophone(s, intensity)
