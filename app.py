@@ -2,13 +2,15 @@
 Flask web application for the AI Text Humanizer.
 
 Supports:
-  - Paste plain text and get humanized output with before/after stats
-  - Upload a .docx file and download a humanized .docx
+  - Paste plain text with typing simulator for Google Docs
+  - Upload a .docx file and download a cleaned, humanized .docx
 """
 
 import os
 import uuid
+import random
 import tempfile
+from datetime import datetime, timedelta
 
 from flask import (
     Flask,
@@ -18,6 +20,7 @@ from flask import (
     send_file,
 )
 from docx import Document
+from docx.opc.constants import RELATIONSHIP_TYPE as RT
 
 from humanizer import humanize_text, humanize_text_with_stats
 
@@ -26,6 +29,68 @@ app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 UPLOAD_DIR = os.path.join(tempfile.gettempdir(), "humanizer_uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+def clean_docx_metadata(doc):
+    """
+    Strip metadata that reveals the document was machine-generated.
+
+    Google Docs and auditing extensions check:
+    - Application name (e.g. "python-docx")
+    - Creator / last modified by
+    - Revision count
+    - Creation / modification timestamps
+    - Custom properties
+    """
+    props = doc.core_properties
+
+    props.author = ""
+    props.last_modified_by = ""
+    props.comments = ""
+    props.category = ""
+    props.subject = ""
+    props.keywords = ""
+    props.description = ""
+    props.content_status = ""
+    props.identifier = ""
+    props.language = "en-US"
+    props.version = ""
+
+    now = datetime.utcnow()
+    writing_duration = timedelta(
+        hours=random.randint(1, 8),
+        minutes=random.randint(0, 59),
+    )
+    props.created = now - writing_duration
+    props.modified = now - timedelta(minutes=random.randint(1, 30))
+
+    props.revision = random.randint(15, 80)
+
+    return doc
+
+
+def strip_tracked_changes(doc):
+    """Remove any tracked changes / revision marks from the document."""
+    try:
+        from lxml import etree
+        nsmap = {
+            'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
+        }
+        body = doc.element.body
+
+        for tag in ['w:ins', 'w:del', 'w:rPrChange', 'w:pPrChange',
+                    'w:sectPrChange', 'w:tblPrChange']:
+            for elem in body.findall('.//' + tag, nsmap):
+                parent = elem.getparent()
+                if parent is not None:
+                    if tag == 'w:ins':
+                        for child in list(elem):
+                            parent.insert(list(parent).index(elem), child)
+                    parent.remove(elem)
+    except Exception:
+        pass
+
+    return doc
 
 
 @app.route("/")
@@ -66,6 +131,7 @@ def humanize_docx_api():
 
     try:
         doc = Document(input_path)
+
         for para in doc.paragraphs:
             if para.text.strip():
                 humanized = humanize_text(para.text, intensity=intensity)
@@ -88,6 +154,9 @@ def humanize_docx_api():
                                     run.text = ""
                             else:
                                 para.text = humanized
+
+        doc = clean_docx_metadata(doc)
+        doc = strip_tracked_changes(doc)
 
         doc.save(output_path)
     except Exception as e:

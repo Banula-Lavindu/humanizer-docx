@@ -29,133 +29,88 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      line-height: 1.65;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; line-height: 1.65;
     }
-
     .container { max-width: 1020px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 
-    /* ── Header ── */
     header { text-align: center; margin-bottom: 2rem; }
     header h1 {
-      font-size: 2.4rem;
-      font-weight: 800;
+      font-size: 2.4rem; font-weight: 800;
       background: linear-gradient(135deg, var(--primary), var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -.02em;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; letter-spacing: -.02em;
     }
     header p { color: var(--text-muted); margin-top: .4rem; font-size: 1.05rem; }
 
-    /* ── Detector badges ── */
-    .detectors {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: .5rem;
-      margin: 1.25rem 0 2rem;
-    }
+    .detectors { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin: 1.25rem 0 2rem; }
     .badge {
-      padding: .35rem .85rem;
-      border-radius: 20px;
-      font-size: .78rem;
-      font-weight: 600;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-muted);
-      letter-spacing: .02em;
+      padding: .35rem .85rem; border-radius: 20px; font-size: .78rem; font-weight: 600;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text-muted);
     }
-    .badge.targeted {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-glow);
-    }
+    .badge.targeted { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
 
-    /* ── Tabs ── */
     .tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; }
     .tab-btn {
       flex: 1; padding: .85rem 1rem;
       border: 1px solid var(--border); border-radius: var(--radius);
       background: var(--surface); color: var(--text-muted);
-      font-size: 1rem; font-weight: 600; cursor: pointer; transition: .2s;
+      font-size: .95rem; font-weight: 600; cursor: pointer; transition: .2s;
     }
     .tab-btn:hover { background: var(--surface-hover); }
-    .tab-btn.active {
-      border-color: var(--primary); color: var(--text);
-      box-shadow: 0 0 20px var(--primary-glow);
-    }
+    .tab-btn.active { border-color: var(--primary); color: var(--text); box-shadow: 0 0 20px var(--primary-glow); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* ── Card ── */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.75rem;
-      margin-bottom: 1.25rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.75rem; margin-bottom: 1.25rem;
     }
-
     label { display: block; font-weight: 600; margin-bottom: .5rem; font-size: .95rem; }
-
     textarea {
-      width: 100%; min-height: 200px;
-      padding: 1rem; border: 1px solid var(--border);
-      border-radius: var(--radius); background: var(--bg);
-      color: var(--text); font-size: .95rem; font-family: inherit;
-      line-height: 1.7; resize: vertical; transition: border-color .2s;
+      width: 100%; min-height: 180px; padding: 1rem;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--bg); color: var(--text); font-size: .95rem;
+      font-family: inherit; line-height: 1.7; resize: vertical; transition: border-color .2s;
     }
     textarea:focus { outline: none; border-color: var(--primary); }
 
-    /* ── Slider ── */
     .slider-group { margin: 1.25rem 0; }
     .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
-    .slider-header span { color: var(--text-muted); font-size: .85rem; }
     .slider-value { font-weight: 700; color: var(--primary); min-width: 2.5rem; text-align: right; }
-
     input[type="range"] {
       -webkit-appearance: none; width: 100%; height: 6px;
       background: var(--border); border-radius: 3px; outline: none;
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
-      background: var(--primary); cursor: pointer;
-      box-shadow: 0 0 10px var(--primary-glow);
+      background: var(--primary); cursor: pointer; box-shadow: 0 0 10px var(--primary-glow);
     }
     input[type="range"]::-moz-range-thumb {
       width: 22px; height: 22px; border-radius: 50%;
       background: var(--primary); cursor: pointer; border: none;
     }
-    .intensity-labels {
-      display: flex; justify-content: space-between;
-      font-size: .75rem; color: var(--text-muted); margin-top: .25rem;
+    .intensity-labels { display: flex; justify-content: space-between; font-size: .75rem; color: var(--text-muted); margin-top: .25rem; }
+
+    .section-label {
+      font-size: .7rem; text-transform: uppercase; letter-spacing: .1em;
+      color: var(--text-muted); margin: 1rem 0 .5rem; padding-bottom: .3rem;
+      border-bottom: 1px solid var(--border);
     }
 
-    /* ── Preset buttons ── */
     .presets { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
     .preset-btn {
-      padding: .5rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: var(--surface-2);
-      color: var(--text-muted);
-      font-size: .82rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: .2s;
+      padding: .5rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface-2); color: var(--text-muted);
+      font-size: .82rem; font-weight: 600; cursor: pointer; transition: .2s;
     }
     .preset-btn:hover { border-color: var(--primary); color: var(--text); }
     .preset-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
 
-    /* ── Buttons ── */
     .btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      gap: .5rem; padding: .9rem 2rem; border: none;
-      border-radius: var(--radius); font-size: 1rem; font-weight: 700;
-      cursor: pointer; transition: .2s;
+      display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+      padding: .9rem 2rem; border: none; border-radius: var(--radius);
+      font-size: 1rem; font-weight: 700; cursor: pointer; transition: .2s;
     }
     .btn-primary { background: var(--primary); color: #fff; width: 100%; }
     .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 4px 20px var(--primary-glow); }
@@ -165,64 +120,89 @@
       color: var(--text-muted); font-size: .82rem; padding: .5rem 1rem;
     }
     .btn-secondary:hover { border-color: var(--primary); color: var(--text); }
+    .btn-green {
+      background: var(--green); color: #fff; font-size: .85rem; padding: .6rem 1.2rem;
+    }
+    .btn-green:hover { opacity: .9; }
+    .btn-green:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-orange {
+      background: var(--orange); color: #000; font-size: .85rem; padding: .6rem 1.2rem;
+    }
+    .btn-orange:hover { opacity: .9; }
 
-    /* ── File upload ── */
     .file-drop {
       border: 2px dashed var(--border); border-radius: var(--radius);
-      padding: 3rem 2rem; text-align: center; cursor: pointer;
-      transition: .2s; position: relative;
+      padding: 3rem 2rem; text-align: center; cursor: pointer; transition: .2s; position: relative;
     }
-    .file-drop:hover, .file-drop.dragover {
-      border-color: var(--primary); background: rgba(108, 92, 231, .04);
-    }
+    .file-drop:hover, .file-drop.dragover { border-color: var(--primary); background: rgba(108,92,231,.04); }
     .file-drop input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
     .file-drop .icon { font-size: 2.5rem; margin-bottom: .75rem; }
     .file-drop p { color: var(--text-muted); }
     .file-drop .filename { margin-top: .75rem; color: var(--accent); font-weight: 600; }
 
-    /* ── Result ── */
     .result-area { display: none; }
     .result-area.visible { display: block; }
-    .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+    .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; flex-wrap: wrap; gap: .5rem; }
+    .result-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
 
-    /* ── Stats panel ── */
-    .stats-panel {
-      display: none;
-      gap: 1rem;
-      margin-bottom: 1.25rem;
-    }
+    .stats-panel { display: none; gap: 1rem; margin-bottom: 1.25rem; }
     .stats-panel.visible { display: grid; grid-template-columns: 1fr 1fr; }
-
-    .stats-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem;
-    }
-    .stats-card h4 {
-      font-size: .8rem;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--text-muted);
-      margin-bottom: .75rem;
-    }
+    .stats-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+    .stats-card h4 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: .75rem; }
     .stats-card.before h4 { color: var(--red); }
     .stats-card.after h4 { color: var(--green); }
-
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      padding: .3rem 0;
-      font-size: .88rem;
-    }
+    .stat-row { display: flex; justify-content: space-between; padding: .3rem 0; font-size: .88rem; }
     .stat-label { color: var(--text-muted); }
     .stat-value { font-weight: 700; }
-
     .stat-value.good { color: var(--green); }
     .stat-value.warn { color: var(--orange); }
     .stat-value.bad { color: var(--red); }
 
-    /* ── Spinner ── */
+    /* Typing simulator */
+    .typing-sim {
+      display: none; margin-top: 1.25rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+    }
+    .typing-sim.visible { display: block; }
+    .typing-sim h4 { font-size: .95rem; margin-bottom: .5rem; color: var(--accent); }
+    .typing-sim p { font-size: .85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5; }
+    .typing-controls { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+    .typing-controls label { margin-bottom: 0; font-size: .85rem; }
+    .typing-controls select, .typing-controls input {
+      padding: .4rem .75rem; background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text); font-size: .85rem;
+    }
+    .typing-progress {
+      height: 6px; background: var(--border); border-radius: 3px;
+      margin: .75rem 0; overflow: hidden;
+    }
+    .typing-progress-bar {
+      height: 100%; width: 0%; background: var(--accent);
+      border-radius: 3px; transition: width .3s;
+    }
+    .typing-status { font-size: .82rem; color: var(--text-muted); margin-top: .4rem; }
+    .typing-output {
+      width: 100%; min-height: 120px; padding: 1rem;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--bg); color: var(--accent); font-size: .95rem;
+      font-family: 'Courier New', monospace; line-height: 1.6;
+      resize: vertical; white-space: pre-wrap;
+    }
+    .typing-sim .chunk-display {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 1rem; margin-top: 1rem;
+      font-size: .9rem; line-height: 1.6;
+    }
+    .chunk-display .chunk {
+      padding: .5rem .75rem; margin: .3rem 0; border-radius: var(--radius-sm);
+      cursor: pointer; transition: .2s; border: 1px solid transparent;
+    }
+    .chunk:hover { border-color: var(--primary); }
+    .chunk.copied { background: rgba(0,184,148,.1); border-color: var(--green); }
+    .chunk.active { background: rgba(108,92,231,.1); border-color: var(--primary); }
+    .chunk-label { font-size: .7rem; color: var(--text-muted); margin-bottom: .2rem; }
+
     .spinner {
       display: none; width: 20px; height: 20px;
       border: 3px solid rgba(255,255,255,.3);
@@ -233,55 +213,24 @@
     .loading .spinner { display: inline-block; }
     .loading .btn-label { display: none; }
 
-    /* ── Status ── */
-    .status {
-      padding: .75rem 1rem; border-radius: var(--radius-sm);
-      margin-top: 1rem; font-size: .9rem; display: none;
-    }
+    .status { padding: .75rem 1rem; border-radius: var(--radius-sm); margin-top: 1rem; font-size: .9rem; display: none; }
     .status.error { display: block; background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.25); color: var(--red); }
     .status.success { display: block; background: rgba(0,184,148,.1); border: 1px solid rgba(0,184,148,.25); color: var(--green); }
 
-    /* ── How it works ── */
-    .how-it-works {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem 1.75rem;
-      margin-top: 2rem;
-    }
+    .how-it-works { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem 1.75rem; margin-top: 2rem; }
     .how-it-works h3 { font-size: 1.1rem; margin-bottom: 1rem; }
-    .technique-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: .75rem;
-    }
-    .technique {
-      padding: .75rem 1rem;
-      background: var(--surface-2);
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-    }
-    .technique strong {
-      font-size: .85rem;
-      color: var(--accent);
-      display: block;
-      margin-bottom: .2rem;
-    }
-    .technique span {
-      font-size: .8rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
+    .technique-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: .75rem; }
+    .technique { padding: .75rem 1rem; background: var(--surface-2); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+    .technique strong { font-size: .85rem; color: var(--accent); display: block; margin-bottom: .2rem; }
+    .technique span { font-size: .8rem; color: var(--text-muted); line-height: 1.4; }
 
-    .section-label {
-      font-size: .7rem;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--text-muted);
-      margin: 1rem 0 .5rem;
-      padding-bottom: .3rem;
-      border-bottom: 1px solid var(--border);
+    .warning-box {
+      background: rgba(253,203,110,.08); border: 1px solid rgba(253,203,110,.25);
+      border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-top: 1.5rem;
     }
+    .warning-box h4 { color: var(--orange); font-size: .95rem; margin-bottom: .5rem; }
+    .warning-box ul { padding-left: 1.25rem; }
+    .warning-box li { color: var(--text-muted); font-size: .85rem; padding: .2rem 0; line-height: 1.5; }
 
     footer { text-align: center; color: var(--text-muted); font-size: .78rem; margin-top: 3rem; }
 
@@ -289,409 +238,487 @@
       .stats-panel.visible { grid-template-columns: 1fr; }
       .technique-grid { grid-template-columns: 1fr; }
       header h1 { font-size: 1.8rem; }
+      .typing-controls { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
+<div class="container">
 
-    <header>
-      <h1>AI Text Humanizer</h1>
-      <p>Defeat AI detectors — sentence by sentence</p>
-    </header>
+  <header>
+    <h1>AI Text Humanizer</h1>
+    <p>Defeat AI detectors and Google Docs tracking — sentence by sentence</p>
+  </header>
 
-    <div class="detectors">
-      <span class="badge targeted">Turnitin</span>
-      <span class="badge targeted">GPTZero</span>
-      <span class="badge targeted">Originality.ai</span>
-      <span class="badge targeted">Copyleaks</span>
-      <span class="badge targeted">ZeroGPT</span>
-      <span class="badge targeted">Winston AI</span>
-      <span class="badge targeted">Sapling</span>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="text-tab">Paste Text</button>
-      <button class="tab-btn" data-tab="docx-tab">Upload .docx</button>
-    </div>
-
-    <!-- ════ TEXT TAB ════ -->
-    <div id="text-tab" class="tab-content active">
-      <div class="card">
-        <label for="input-text">Paste your AI-generated text</label>
-        <textarea id="input-text" placeholder="Paste your ChatGPT / Claude / Gemini text here..."></textarea>
-
-        <div class="slider-group">
-          <div class="slider-header">
-            <label for="text-intensity" style="margin-bottom:0">Humanization Intensity</label>
-            <span class="slider-value" id="text-intensity-val">50%</span>
-          </div>
-          <input type="range" id="text-intensity" min="0" max="100" value="50">
-          <div class="intensity-labels">
-            <span>Subtle — light edits</span>
-            <span>Moderate — balanced</span>
-            <span>Aggressive — max bypass</span>
-          </div>
-        </div>
-
-        <p class="section-label">Quick presets</p>
-        <div class="presets">
-          <button class="preset-btn" data-val="25">Essay — Light</button>
-          <button class="preset-btn active" data-val="50">General — Balanced</button>
-          <button class="preset-btn" data-val="75">Turnitin Buster</button>
-          <button class="preset-btn" data-val="90">Maximum Bypass</button>
-        </div>
-
-        <button class="btn btn-primary" id="humanize-text-btn">
-          <span class="btn-label">Humanize Text</span>
-          <div class="spinner"></div>
-        </button>
-
-        <div class="status" id="text-status"></div>
-      </div>
-
-      <!-- Stats -->
-      <div class="stats-panel" id="stats-panel">
-        <div class="stats-card before">
-          <h4>Before — AI Patterns Detected</h4>
-          <div id="before-stats"></div>
-        </div>
-        <div class="stats-card after">
-          <h4>After — Human Patterns</h4>
-          <div id="after-stats"></div>
-        </div>
-      </div>
-
-      <!-- Result -->
-      <div class="result-area" id="text-result">
-        <div class="card">
-          <div class="result-header">
-            <label for="output-text" style="margin-bottom:0">Humanized Output</label>
-            <div style="display:flex;gap:.5rem">
-              <button class="btn btn-secondary" id="re-humanize-btn" title="Run again for different variation">Re-roll</button>
-              <button class="btn btn-secondary" id="copy-btn">Copy</button>
-            </div>
-          </div>
-          <textarea id="output-text" readonly></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- ════ DOCX TAB ════ -->
-    <div id="docx-tab" class="tab-content">
-      <div class="card">
-        <label>Upload your .docx file</label>
-        <div class="file-drop" id="file-drop">
-          <input type="file" id="docx-input" accept=".docx">
-          <div class="icon">&#128196;</div>
-          <p>Drag & drop a <strong>.docx</strong> file here or click to browse</p>
-          <div class="filename" id="file-name"></div>
-        </div>
-
-        <div class="slider-group">
-          <div class="slider-header">
-            <label for="docx-intensity" style="margin-bottom:0">Humanization Intensity</label>
-            <span class="slider-value" id="docx-intensity-val">50%</span>
-          </div>
-          <input type="range" id="docx-intensity" min="0" max="100" value="50">
-          <div class="intensity-labels">
-            <span>Subtle</span>
-            <span>Moderate</span>
-            <span>Aggressive</span>
-          </div>
-        </div>
-
-        <button class="btn btn-primary" id="humanize-docx-btn" disabled>
-          <span class="btn-label">Humanize &amp; Download</span>
-          <div class="spinner"></div>
-        </button>
-
-        <div class="status" id="docx-status"></div>
-      </div>
-    </div>
-
-    <!-- ════ HOW IT WORKS ════ -->
-    <div class="how-it-works">
-      <h3>How it defeats AI detectors</h3>
-      <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:1rem">
-        AI detectors measure <strong style="color:var(--accent)">perplexity</strong> (word predictability),
-        <strong style="color:var(--accent)">burstiness</strong> (sentence length variation), and
-        <strong style="color:var(--accent)">structural patterns</strong>.
-        This tool attacks all three signals simultaneously, sentence by sentence.
-      </p>
-
-      <p class="section-label">Perplexity Attacks — Make words less predictable</p>
-      <div class="technique-grid">
-        <div class="technique">
-          <strong>AI Word Removal</strong>
-          <span>"delve", "multifaceted", "tapestry", "pivotal" — replaced with casual alternatives</span>
-        </div>
-        <div class="technique">
-          <strong>Synonym Diversification</strong>
-          <span>Predictable words swapped for uncommon synonyms to spike entropy</span>
-        </div>
-        <div class="technique">
-          <strong>Formal → Informal</strong>
-          <span>"utilize" → "use", "furthermore" → "also", 120+ replacements</span>
-        </div>
-        <div class="technique">
-          <strong>Contractions</strong>
-          <span>"do not" → "don't", "it is" → "it's" — humans contract ~70% of the time</span>
-        </div>
-      </div>
-
-      <p class="section-label">Burstiness Attacks — Vary sentence rhythm</p>
-      <div class="technique-grid">
-        <div class="technique">
-          <strong>Sentence Splitting</strong>
-          <span>Breaks long AI sentences into shorter, punchier fragments</span>
-        </div>
-        <div class="technique">
-          <strong>Fragment Injection</strong>
-          <span>Inserts short fragments: "Big difference." "Makes you think."</span>
-        </div>
-        <div class="technique">
-          <strong>Rhetorical Questions</strong>
-          <span>"But why does this matter?" — breaks monotone rhythm</span>
-        </div>
-        <div class="technique">
-          <strong>Length Variation</strong>
-          <span>Forces dramatic swings between 3-word and 30-word sentences</span>
-        </div>
-      </div>
-
-      <p class="section-label">Structural Attacks — Break AI patterns</p>
-      <div class="technique-grid">
-        <div class="technique">
-          <strong>AI Intro Rewriting</strong>
-          <span>"In today's rapidly evolving world..." detected and rewritten entirely</span>
-        </div>
-        <div class="technique">
-          <strong>Personal Voice</strong>
-          <span>Adds "I think", "from what I've seen", first-person perspective</span>
-        </div>
-        <div class="technique">
-          <strong>Passive → Active</strong>
-          <span>"was implemented by teams" → "teams implemented"</span>
-        </div>
-        <div class="technique">
-          <strong>Self-Corrections</strong>
-          <span>"— well, not exactly, but close" — humans rethink mid-sentence</span>
-        </div>
-      </div>
-
-      <p class="section-label">Human Noise — Perfect text = AI text</p>
-      <div class="technique-grid">
-        <div class="technique">
-          <strong>Realistic Typos</strong>
-          <span>Common misspellings + keyboard-neighbor swaps ("teh", "becuase")</span>
-        </div>
-        <div class="technique">
-          <strong>Homophone Swaps</strong>
-          <span>their/there, your/you're, then/than — classic human errors</span>
-        </div>
-        <div class="technique">
-          <strong>Punctuation Mistakes</strong>
-          <span>Dropped periods, extra commas, em-dashes, semicolon splices</span>
-        </div>
-        <div class="technique">
-          <strong>Filler & Parentheticals</strong>
-          <span>"honestly", "tbh", "(which honestly makes sense)" — natural asides</span>
-        </div>
-      </div>
-    </div>
-
-    <footer>
-      AI Text Humanizer &mdash; Targets Turnitin, GPTZero, Originality.ai, Copyleaks, ZeroGPT, Winston AI, Sapling
-    </footer>
+  <div class="detectors">
+    <span class="badge targeted">Turnitin</span>
+    <span class="badge targeted">GPTZero</span>
+    <span class="badge targeted">Originality.ai</span>
+    <span class="badge targeted">Copyleaks</span>
+    <span class="badge targeted">ZeroGPT</span>
+    <span class="badge targeted">Winston AI</span>
+    <span class="badge targeted">Sapling</span>
+    <span class="badge targeted">Google Docs Audit</span>
   </div>
 
-  <script>
-    // ── Tabs ──
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(btn.dataset.tab).classList.add('active');
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="text-tab">Paste Text</button>
+    <button class="tab-btn" data-tab="docx-tab">Upload .docx</button>
+  </div>
+
+  <!-- ═══ TEXT TAB ═══ -->
+  <div id="text-tab" class="tab-content active">
+    <div class="card">
+      <label for="input-text">Paste your AI-generated text</label>
+      <textarea id="input-text" placeholder="Paste your ChatGPT / Claude / Gemini text here..."></textarea>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <label for="text-intensity" style="margin-bottom:0">Humanization Intensity</label>
+          <span class="slider-value" id="text-intensity-val">50%</span>
+        </div>
+        <input type="range" id="text-intensity" min="0" max="100" value="50">
+        <div class="intensity-labels">
+          <span>Subtle — light edits</span>
+          <span>Moderate</span>
+          <span>Aggressive — max bypass</span>
+        </div>
+      </div>
+
+      <p class="section-label">Quick presets</p>
+      <div class="presets">
+        <button class="preset-btn" data-val="25">Essay — Light</button>
+        <button class="preset-btn active" data-val="50">General — Balanced</button>
+        <button class="preset-btn" data-val="75">Turnitin Buster</button>
+        <button class="preset-btn" data-val="90">Maximum Bypass</button>
+      </div>
+
+      <button class="btn btn-primary" id="humanize-text-btn">
+        <span class="btn-label">Humanize Text</span>
+        <div class="spinner"></div>
+      </button>
+      <div class="status" id="text-status"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-panel" id="stats-panel">
+      <div class="stats-card before">
+        <h4>Before — AI Patterns Detected</h4>
+        <div id="before-stats"></div>
+      </div>
+      <div class="stats-card after">
+        <h4>After — Human Patterns</h4>
+        <div id="after-stats"></div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="result-area" id="text-result">
+      <div class="card">
+        <div class="result-header">
+          <label for="output-text" style="margin-bottom:0">Humanized Output</label>
+          <div class="result-actions">
+            <button class="btn btn-secondary" id="re-humanize-btn">Re-roll</button>
+            <button class="btn btn-secondary" id="copy-btn">Copy</button>
+            <button class="btn btn-green" id="open-typing-sim-btn">Typing Simulator</button>
+          </div>
+        </div>
+        <textarea id="output-text" readonly></textarea>
+      </div>
+
+      <!-- Typing Simulator -->
+      <div class="typing-sim" id="typing-sim">
+        <h4>Google Docs Typing Simulator</h4>
+        <p>
+          Google Docs tracks <strong>typing vs pasting ratios</strong> and flags text that appears
+          at impossible speeds. Use one of these methods to make your text look organically typed:
+        </p>
+
+        <p class="section-label">Method 1: Auto-type into a text field (practice mode)</p>
+        <div class="typing-controls">
+          <label>Speed:</label>
+          <select id="typing-speed">
+            <option value="slow">Slow (30 WPM)</option>
+            <option value="medium" selected>Medium (50 WPM)</option>
+            <option value="fast">Fast (80 WPM)</option>
+            <option value="vfast">Very Fast (120 WPM)</option>
+          </select>
+          <label>Mistakes:</label>
+          <select id="typing-mistakes">
+            <option value="none">None</option>
+            <option value="light" selected>Light</option>
+            <option value="heavy">Heavy</option>
+          </select>
+          <button class="btn btn-green" id="start-typing-btn">Start Typing</button>
+          <button class="btn btn-secondary" id="stop-typing-btn" style="display:none">Stop</button>
+        </div>
+        <div class="typing-progress"><div class="typing-progress-bar" id="typing-progress-bar"></div></div>
+        <div class="typing-status" id="typing-status">Ready — click Start to simulate typing</div>
+        <textarea class="typing-output" id="typing-output" readonly placeholder="Simulated typing will appear here..."></textarea>
+
+        <p class="section-label" style="margin-top:1.5rem">Method 2: Copy paragraph by paragraph</p>
+        <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:.75rem">
+          Click each paragraph to copy it. Paste into Google Docs one at a time with
+          pauses between each. This mimics natural writing sessions.
+        </p>
+        <div class="chunk-display" id="chunk-display"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DOCX TAB ═══ -->
+  <div id="docx-tab" class="tab-content">
+    <div class="card">
+      <label>Upload your .docx file</label>
+      <div class="file-drop" id="file-drop">
+        <input type="file" id="docx-input" accept=".docx">
+        <div class="icon">&#128196;</div>
+        <p>Drag & drop a <strong>.docx</strong> file here or click to browse</p>
+        <div class="filename" id="file-name"></div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <label for="docx-intensity" style="margin-bottom:0">Humanization Intensity</label>
+          <span class="slider-value" id="docx-intensity-val">50%</span>
+        </div>
+        <input type="range" id="docx-intensity" min="0" max="100" value="50">
+        <div class="intensity-labels"><span>Subtle</span><span>Moderate</span><span>Aggressive</span></div>
+      </div>
+
+      <button class="btn btn-primary" id="humanize-docx-btn" disabled>
+        <span class="btn-label">Humanize &amp; Download</span>
+        <div class="spinner"></div>
+      </button>
+      <div class="status" id="docx-status"></div>
+    </div>
+
+    <!-- Google Docs warning -->
+    <div class="warning-box">
+      <h4>Google Docs Tracking — What gets detected</h4>
+      <ul>
+        <li><strong>Typing vs Pasting Ratio:</strong> Extensions measure what % was typed character-by-character vs pasted from outside. Large pastes are flagged.</li>
+        <li><strong>Writing Velocity:</strong> A 500-word paragraph appearing in 3 seconds = impossible for a human. Flagged as AI drop or copy-paste.</li>
+        <li><strong>Session Breakdown:</strong> Google tracks how many times you opened the doc, exact start/end times, and idle periods.</li>
+        <li><strong>Revision History:</strong> Every keystroke is logged. A document with no revision history but 2000 words = suspicious.</li>
+        <li><strong>Contributor Tracking:</strong> Every character is tagged to a Google account with exact timestamps.</li>
+      </ul>
+      <p style="color:var(--accent);font-size:.85rem;margin-top:.75rem;font-weight:600">
+        Use the Typing Simulator (paste text tab) to type text into Google Docs at human speed, or paste paragraph by paragraph with natural pauses.
+      </p>
+    </div>
+  </div>
+
+  <!-- ═══ HOW IT WORKS ═══ -->
+  <div class="how-it-works">
+    <h3>How it defeats AI detectors</h3>
+    <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:1rem">
+      Attacks <strong style="color:var(--accent)">perplexity</strong>,
+      <strong style="color:var(--accent)">burstiness</strong>,
+      <strong style="color:var(--accent)">structural patterns</strong>, and
+      <strong style="color:var(--accent)">Google Docs forensics</strong>.
+    </p>
+
+    <p class="section-label">Perplexity — Make words less predictable</p>
+    <div class="technique-grid">
+      <div class="technique"><strong>AI Word Removal</strong><span>"delve", "multifaceted", "tapestry" — 80+ words replaced</span></div>
+      <div class="technique"><strong>Synonym Diversification</strong><span>60+ uncommon synonym swaps to spike entropy</span></div>
+      <div class="technique"><strong>Informal Expressions</strong><span>45+ stiff phrases → casual versions</span></div>
+      <div class="technique"><strong>Contractions</strong><span>"do not" → "don't" at 60-95% rate</span></div>
+    </div>
+
+    <p class="section-label">Burstiness — Vary sentence rhythm</p>
+    <div class="technique-grid">
+      <div class="technique"><strong>Sentence Splitting</strong><span>Breaks long AI sentences into fragments</span></div>
+      <div class="technique"><strong>Fragments & Questions</strong><span>"Big difference." "Sound familiar?"</span></div>
+      <div class="technique"><strong>Run-on Sentences</strong><span>Joins thoughts with commas — very human</span></div>
+      <div class="technique"><strong>Length Variation</strong><span>3-word to 30-word swings</span></div>
+    </div>
+
+    <p class="section-label">Structure — Break AI patterns</p>
+    <div class="technique-grid">
+      <div class="technique"><strong>Opener Diversification</strong><span>Prevents repetitive The/This/It starts</span></div>
+      <div class="technique"><strong>Personal Voice</strong><span>"I think", "from what I've seen"</span></div>
+      <div class="technique"><strong>Grammar Imperfections</strong><span>whom→who, run-ons, natural errors</span></div>
+      <div class="technique"><strong>Paragraph Breaking</strong><span>Disrupts topic-support-conclusion pattern</span></div>
+    </div>
+
+    <p class="section-label">Google Docs — Beat forensic tracking</p>
+    <div class="technique-grid">
+      <div class="technique"><strong>Typing Simulator</strong><span>Types text character-by-character at human WPM speed</span></div>
+      <div class="technique"><strong>Paragraph Delivery</strong><span>Copy one paragraph at a time with natural pauses</span></div>
+      <div class="technique"><strong>Metadata Cleaning</strong><span>Strips generator info, sets realistic revision count</span></div>
+      <div class="technique"><strong>Tracked Changes Removal</strong><span>Cleans revision marks from .docx files</span></div>
+    </div>
+  </div>
+
+  <footer>AI Text Humanizer — Targets Turnitin, GPTZero, Originality.ai, Copyleaks, ZeroGPT, Winston AI, Google Docs</footer>
+</div>
+
+<script>
+// ── Tabs ──
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ── Sliders ──
+function bindSlider(id, valId) {
+  const s = document.getElementById(id), v = document.getElementById(valId);
+  s.addEventListener('input', () => {
+    v.textContent = s.value + '%';
+    document.querySelectorAll('.preset-btn').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.val) === parseInt(s.value));
+    });
+  });
+}
+bindSlider('text-intensity', 'text-intensity-val');
+bindSlider('docx-intensity', 'docx-intensity-val');
+
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const v = parseInt(btn.dataset.val);
+    document.getElementById('text-intensity').value = v;
+    document.getElementById('text-intensity-val').textContent = v + '%';
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ── Stats ──
+function renderStats(id, stats, type) {
+  const el = document.getElementById(id);
+  const bc = type==='before' ? (stats.burstiness<4?'bad':stats.burstiness<7?'warn':'good')
+    : (stats.burstiness>5?'good':stats.burstiness>3?'warn':'bad');
+  const vc = type==='before' ? (stats.vocab_richness<0.5?'bad':stats.vocab_richness<0.65?'warn':'good')
+    : (stats.vocab_richness>0.55?'good':stats.vocab_richness>0.45?'warn':'bad');
+  el.innerHTML = `
+    <div class="stat-row"><span class="stat-label">Sentences</span><span class="stat-value">${stats.sentence_count}</span></div>
+    <div class="stat-row"><span class="stat-label">Avg words/sentence</span><span class="stat-value">${stats.avg_words_per_sentence}</span></div>
+    <div class="stat-row"><span class="stat-label">Shortest</span><span class="stat-value">${stats.shortest_sentence} words</span></div>
+    <div class="stat-row"><span class="stat-label">Longest</span><span class="stat-value">${stats.longest_sentence} words</span></div>
+    <div class="stat-row"><span class="stat-label">Burstiness</span><span class="stat-value ${bc}">${stats.burstiness}</span></div>
+    <div class="stat-row"><span class="stat-label">Vocab richness</span><span class="stat-value ${vc}">${stats.vocab_richness}</span></div>`;
+}
+
+// ── Humanize text ──
+let lastResult = '';
+async function doHumanize() {
+  const text = document.getElementById('input-text').value.trim();
+  const status = document.getElementById('text-status');
+  status.className = 'status'; status.style.display = 'none';
+  if (!text) { status.className = 'status error'; status.textContent = 'Please paste some text first.'; return; }
+
+  const intensity = document.getElementById('text-intensity').value / 100;
+  const btn = document.getElementById('humanize-text-btn');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/humanize-text', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({text, intensity})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Something went wrong');
+
+    lastResult = data.result;
+    document.getElementById('output-text').value = data.result;
+    document.getElementById('text-result').classList.add('visible');
+    renderStats('before-stats', data.before, 'before');
+    renderStats('after-stats', data.after, 'after');
+    document.getElementById('stats-panel').classList.add('visible');
+    document.getElementById('typing-sim').classList.remove('visible');
+    buildChunks(data.result);
+  } catch (err) {
+    status.className = 'status error'; status.textContent = err.message;
+  } finally {
+    btn.classList.remove('loading'); btn.disabled = false;
+  }
+}
+document.getElementById('humanize-text-btn').addEventListener('click', doHumanize);
+document.getElementById('re-humanize-btn').addEventListener('click', doHumanize);
+
+// ── Copy ──
+document.getElementById('copy-btn').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.getElementById('output-text').value).then(() => {
+    const b = document.getElementById('copy-btn');
+    b.textContent = 'Copied!'; setTimeout(() => b.textContent = 'Copy', 1500);
+  });
+});
+
+// ── Typing simulator toggle ──
+document.getElementById('open-typing-sim-btn').addEventListener('click', () => {
+  const sim = document.getElementById('typing-sim');
+  sim.classList.toggle('visible');
+});
+
+// ── Build paragraph chunks ──
+function buildChunks(text) {
+  const container = document.getElementById('chunk-display');
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+  container.innerHTML = '';
+  paragraphs.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'chunk';
+    div.innerHTML = `<div class="chunk-label">Paragraph ${i+1} — click to copy</div>${p}`;
+    div.addEventListener('click', () => {
+      navigator.clipboard.writeText(p).then(() => {
+        div.classList.add('copied');
+        div.querySelector('.chunk-label').textContent = `Paragraph ${i+1} — copied! Wait 30-90s before pasting next`;
+        setTimeout(() => {
+          div.classList.remove('copied');
+          div.querySelector('.chunk-label').textContent = `Paragraph ${i+1} — click to copy`;
+        }, 5000);
       });
     });
+    container.appendChild(div);
+  });
+}
 
-    // ── Sliders ──
-    function bindSlider(sliderId, valId) {
-      const slider = document.getElementById(sliderId);
-      const valEl = document.getElementById(valId);
-      slider.addEventListener('input', () => {
-        valEl.textContent = slider.value + '%';
-        document.querySelectorAll('.preset-btn').forEach(b => {
-          b.classList.toggle('active', parseInt(b.dataset.val) === parseInt(slider.value));
-        });
-      });
+// ── Typing simulator engine ──
+let typingInterval = null;
+const speeds = { slow: 200, medium: 120, fast: 75, vfast: 50 };
+
+document.getElementById('start-typing-btn').addEventListener('click', startTyping);
+document.getElementById('stop-typing-btn').addEventListener('click', stopTyping);
+
+function startTyping() {
+  if (!lastResult) return;
+  stopTyping();
+
+  const output = document.getElementById('typing-output');
+  const bar = document.getElementById('typing-progress-bar');
+  const status = document.getElementById('typing-status');
+  const startBtn = document.getElementById('start-typing-btn');
+  const stopBtn = document.getElementById('stop-typing-btn');
+  const speed = document.getElementById('typing-speed').value;
+  const mistakes = document.getElementById('typing-mistakes').value;
+
+  output.value = '';
+  bar.style.width = '0%';
+  startBtn.style.display = 'none';
+  stopBtn.style.display = 'inline-flex';
+
+  const text = lastResult;
+  let pos = 0;
+  const baseDelay = speeds[speed];
+  const totalChars = text.length;
+
+  function typeNext() {
+    if (pos >= totalChars) {
+      stopTyping();
+      status.textContent = `Done! ${totalChars} characters typed at simulated human speed.`;
+      return;
     }
-    bindSlider('text-intensity', 'text-intensity-val');
-    bindSlider('docx-intensity', 'docx-intensity-val');
 
-    // ── Presets ──
-    document.querySelectorAll('.preset-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const val = parseInt(btn.dataset.val);
-        document.getElementById('text-intensity').value = val;
-        document.getElementById('text-intensity-val').textContent = val + '%';
-        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
-    });
+    const ch = text[pos];
+    let delay = baseDelay;
 
-    // ── Stats rendering ──
-    function renderStats(containerId, stats, type) {
-      const el = document.getElementById(containerId);
-      const burstClass = type === 'before'
-        ? (stats.burstiness < 4 ? 'bad' : stats.burstiness < 7 ? 'warn' : 'good')
-        : (stats.burstiness > 5 ? 'good' : stats.burstiness > 3 ? 'warn' : 'bad');
-      const vocabClass = type === 'before'
-        ? (stats.vocab_richness < 0.5 ? 'bad' : stats.vocab_richness < 0.65 ? 'warn' : 'good')
-        : (stats.vocab_richness > 0.55 ? 'good' : stats.vocab_richness > 0.45 ? 'warn' : 'bad');
+    // Vary speed like a real human
+    delay += Math.random() * baseDelay * 0.8 - baseDelay * 0.3;
 
-      el.innerHTML = `
-        <div class="stat-row">
-          <span class="stat-label">Sentences</span>
-          <span class="stat-value">${stats.sentence_count}</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Avg words/sentence</span>
-          <span class="stat-value">${stats.avg_words_per_sentence}</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Shortest sentence</span>
-          <span class="stat-value">${stats.shortest_sentence} words</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Longest sentence</span>
-          <span class="stat-value">${stats.longest_sentence} words</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Burstiness score</span>
-          <span class="stat-value ${burstClass}">${stats.burstiness}</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Vocab richness</span>
-          <span class="stat-value ${vocabClass}">${stats.vocab_richness}</span>
-        </div>
-      `;
+    // Slower after punctuation (thinking pause)
+    if ('.!?'.includes(ch)) delay += baseDelay * 3 + Math.random() * 500;
+    else if (',;:'.includes(ch)) delay += baseDelay * 1.5;
+    else if (ch === '\n') delay += baseDelay * 4 + Math.random() * 800;
+    else if (ch === ' ') delay += Math.random() * baseDelay * 0.5;
+
+    // Occasional typo + backspace simulation
+    if (mistakes !== 'none' && ch.match(/[a-z]/i) && Math.random() < (mistakes === 'heavy' ? 0.04 : 0.015)) {
+      const wrongChar = String.fromCharCode(ch.charCodeAt(0) + (Math.random() > 0.5 ? 1 : -1));
+      output.value += wrongChar;
+      output.scrollTop = output.scrollHeight;
+
+      setTimeout(() => {
+        output.value = output.value.slice(0, -1);
+        setTimeout(() => {
+          output.value += ch;
+          pos++;
+          bar.style.width = (pos / totalChars * 100) + '%';
+          const wpm = Math.round(pos / 5 / ((Date.now() - startTime) / 60000));
+          status.textContent = `Typing... ${pos}/${totalChars} chars (${wpm} WPM)`;
+          output.scrollTop = output.scrollHeight;
+          typingInterval = setTimeout(typeNext, delay);
+        }, 100 + Math.random() * 200);
+      }, 150 + Math.random() * 250);
+      return;
     }
 
-    // ── Text humanize ──
-    async function doHumanize() {
-      const text = document.getElementById('input-text').value.trim();
-      const statusEl = document.getElementById('text-status');
-      statusEl.className = 'status';
-      statusEl.style.display = 'none';
+    // Random pause (thinking)
+    if (Math.random() < 0.005) delay += 1500 + Math.random() * 3000;
 
-      if (!text) {
-        statusEl.className = 'status error';
-        statusEl.textContent = 'Please paste some text first.';
-        return;
-      }
+    output.value += ch;
+    pos++;
+    bar.style.width = (pos / totalChars * 100) + '%';
+    const elapsed = (Date.now() - startTime) / 60000;
+    const wpm = elapsed > 0.01 ? Math.round(pos / 5 / elapsed) : 0;
+    status.textContent = `Typing... ${pos}/${totalChars} chars (${wpm} WPM)`;
+    output.scrollTop = output.scrollHeight;
 
-      const intensity = document.getElementById('text-intensity').value / 100;
-      const btn = document.getElementById('humanize-text-btn');
-      btn.classList.add('loading');
-      btn.disabled = true;
+    typingInterval = setTimeout(typeNext, delay);
+  }
 
-      try {
-        const res = await fetch('/api/humanize-text', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, intensity })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Something went wrong');
+  const startTime = Date.now();
+  status.textContent = 'Typing...';
+  typeNext();
+}
 
-        document.getElementById('output-text').value = data.result;
-        document.getElementById('text-result').classList.add('visible');
+function stopTyping() {
+  if (typingInterval) { clearTimeout(typingInterval); typingInterval = null; }
+  document.getElementById('start-typing-btn').style.display = 'inline-flex';
+  document.getElementById('stop-typing-btn').style.display = 'none';
+}
 
-        renderStats('before-stats', data.before, 'before');
-        renderStats('after-stats', data.after, 'after');
-        document.getElementById('stats-panel').classList.add('visible');
+// ── File upload ──
+const fileInput = document.getElementById('docx-input');
+const fileDrop = document.getElementById('file-drop');
+const fileNameEl = document.getElementById('file-name');
+const docxBtn = document.getElementById('humanize-docx-btn');
 
-      } catch (err) {
-        statusEl.className = 'status error';
-        statusEl.textContent = err.message;
-      } finally {
-        btn.classList.remove('loading');
-        btn.disabled = false;
-      }
-    }
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length) { fileNameEl.textContent = fileInput.files[0].name; docxBtn.disabled = false; }
+});
+fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('dragover'); });
+fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
+fileDrop.addEventListener('drop', e => {
+  e.preventDefault(); fileDrop.classList.remove('dragover');
+  if (e.dataTransfer.files.length) {
+    fileInput.files = e.dataTransfer.files;
+    fileNameEl.textContent = e.dataTransfer.files[0].name; docxBtn.disabled = false;
+  }
+});
 
-    document.getElementById('humanize-text-btn').addEventListener('click', doHumanize);
-    document.getElementById('re-humanize-btn').addEventListener('click', doHumanize);
+// ── DOCX humanize ──
+docxBtn.addEventListener('click', async () => {
+  const status = document.getElementById('docx-status');
+  status.className = 'status'; status.style.display = 'none';
+  if (!fileInput.files.length) return;
 
-    // ── Copy ──
-    document.getElementById('copy-btn').addEventListener('click', () => {
-      const output = document.getElementById('output-text');
-      navigator.clipboard.writeText(output.value).then(() => {
-        const btn = document.getElementById('copy-btn');
-        btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
-      });
-    });
+  const intensity = document.getElementById('docx-intensity').value / 100;
+  const fd = new FormData();
+  fd.append('file', fileInput.files[0]);
+  fd.append('intensity', intensity);
 
-    // ── File upload ──
-    const fileInput = document.getElementById('docx-input');
-    const fileDrop = document.getElementById('file-drop');
-    const fileNameEl = document.getElementById('file-name');
-    const docxBtn = document.getElementById('humanize-docx-btn');
+  docxBtn.classList.add('loading'); docxBtn.disabled = true;
 
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files.length) {
-        fileNameEl.textContent = fileInput.files[0].name;
-        docxBtn.disabled = false;
-      }
-    });
-    fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('dragover'); });
-    fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
-    fileDrop.addEventListener('drop', e => {
-      e.preventDefault(); fileDrop.classList.remove('dragover');
-      if (e.dataTransfer.files.length) {
-        fileInput.files = e.dataTransfer.files;
-        fileNameEl.textContent = e.dataTransfer.files[0].name;
-        docxBtn.disabled = false;
-      }
-    });
-
-    // ── DOCX humanize ──
-    docxBtn.addEventListener('click', async () => {
-      const statusEl = document.getElementById('docx-status');
-      statusEl.className = 'status'; statusEl.style.display = 'none';
-      if (!fileInput.files.length) return;
-
-      const intensity = document.getElementById('docx-intensity').value / 100;
-      const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
-      formData.append('intensity', intensity);
-
-      docxBtn.classList.add('loading'); docxBtn.disabled = true;
-
-      try {
-        const res = await fetch('/api/humanize-docx', { method: 'POST', body: formData });
-        if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Something went wrong'); }
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileInput.files[0].name.replace('.docx', '') + '_humanized.docx';
-        document.body.appendChild(a); a.click(); a.remove();
-        URL.revokeObjectURL(url);
-        statusEl.className = 'status success';
-        statusEl.textContent = 'File downloaded! Run it through Turnitin to verify.';
-      } catch (err) {
-        statusEl.className = 'status error';
-        statusEl.textContent = err.message;
-      } finally {
-        docxBtn.classList.remove('loading'); docxBtn.disabled = false;
-      }
-    });
-  </script>
+  try {
+    const res = await fetch('/api/humanize-docx', { method: 'POST', body: fd });
+    if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fileInput.files[0].name.replace('.docx','') + '_humanized.docx';
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    status.className = 'status success';
+    status.textContent = 'Downloaded! Metadata cleaned, revision history stripped, ready to use.';
+  } catch (err) {
+    status.className = 'status error'; status.textContent = err.message;
+  } finally { docxBtn.classList.remove('loading'); docxBtn.disabled = false; }
+});
+</script>
 </body>
 </html>
