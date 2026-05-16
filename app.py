@@ -44,7 +44,6 @@ def apply_metadata(doc, form_data):
     props.comments = ""
     props.category = ""
     props.keywords = ""
-    props.description = ""
     props.content_status = ""
     props.identifier = ""
     props.language = form_data.get("meta_language", "en-US").strip() or "en-US"
@@ -105,9 +104,56 @@ def strip_tracked_changes(doc):
     return doc
 
 
+def _fmt_dt(value):
+    if not value:
+        return ""
+    try:
+        return value.strftime("%Y-%m-%dT%H:%M")
+    except AttributeError:
+        return str(value)
+
+
+def read_metadata(doc):
+    """Read core document properties and return a JSON-friendly dict."""
+    props = doc.core_properties
+    return {
+        "author": props.author or "",
+        "last_modified_by": props.last_modified_by or "",
+        "title": props.title or "",
+        "subject": props.subject or "",
+        "keywords": props.keywords or "",
+        "category": props.category or "",
+        "comments": props.comments or "",
+        "content_status": props.content_status or "",
+        "identifier": props.identifier or "",
+        "language": props.language or "",
+        "version": props.version or "",
+        "revision": props.revision or 0,
+        "created": _fmt_dt(props.created),
+        "modified": _fmt_dt(props.modified),
+        "last_printed": _fmt_dt(props.last_printed),
+    }
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/api/inspect-docx", methods=["POST"])
+def inspect_docx_api():
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    if not file.filename or not file.filename.lower().endswith(".docx"):
+        return jsonify({"error": "Please upload a .docx file"}), 400
+
+    try:
+        doc = Document(file.stream)
+        return jsonify({"metadata": read_metadata(doc)})
+    except Exception as e:
+        return jsonify({"error": f"Failed to read document: {str(e)}"}), 500
 
 
 @app.route("/api/humanize-text", methods=["POST"])
@@ -187,4 +233,4 @@ def humanize_docx_api():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=False, host="0.0.0.0", port=int(os.environ.get("PORT", "5050")))

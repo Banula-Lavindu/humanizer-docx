@@ -129,6 +129,19 @@
     .drop-zone p { color:var(--text-m); font-size:.88rem; }
     .drop-zone .file-name { margin-top:.5rem; color:var(--accent); font-weight:700; font-size:.9rem; }
 
+    /* Detected metadata panel */
+    .detected { display:none; margin-top:1rem; padding:.85rem 1rem; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r-sm); }
+    .detected.visible { display:block; animation:fadeIn .25s ease; }
+    .detected-head { display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-bottom:.6rem; flex-wrap:wrap; }
+    .detected-head h4 { font-size:.82rem; font-weight:700; color:var(--text); display:flex; align-items:center; gap:.4rem; }
+    .detected-head h4::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent); }
+    .detected-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.5rem .9rem; }
+    .detected-row { display:flex; flex-direction:column; gap:.1rem; min-width:0; }
+    .detected-key { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-m); }
+    .detected-val { font-size:.8rem; color:var(--text); word-break:break-word; }
+    .detected-val.empty { color:var(--text-m); font-style:italic; }
+    .detected-loading { font-size:.8rem; color:var(--text-m); }
+
     /* Metadata section */
     .meta-section { margin-top:1.25rem; }
     .meta-toggle { display:flex; align-items:center; gap:.5rem; cursor:pointer; padding:.5rem 0; user-select:none; }
@@ -259,6 +272,16 @@
         Customize these fields or leave blank for realistic auto-generated values.
       </p>
 
+      <!-- Detected metadata panel -->
+      <div class="detected" id="detected-panel">
+        <div class="detected-head">
+          <h4>Current metadata detected in file</h4>
+          <button type="button" class="btn btn-sm" id="prefill-btn">Use these values</button>
+        </div>
+        <div class="detected-grid" id="detected-grid"></div>
+      </div>
+      <div class="detected-loading" id="detected-loading" style="display:none;margin-top:.75rem">Reading document properties&hellip;</div>
+
       <div class="form-grid">
         <div class="form-group">
           <label for="meta-author">Author</label>
@@ -318,7 +341,7 @@
             <div class="form-group full">
               <label>These fields are always cleaned automatically:</label>
               <p class="meta-info" style="margin:0">
-                <strong>Comments</strong>, <strong>Keywords</strong>, <strong>Description</strong>,
+                <strong>Comments</strong>, <strong>Keywords</strong>,
                 <strong>Category</strong>, <strong>Content Status</strong>, <strong>Identifier</strong>,
                 <strong>Version</strong> — all cleared to remove any AI-tool fingerprints.
                 <br><strong>Tracked Changes</strong> and <strong>Revision Marks</strong> are stripped from the document body.
@@ -420,10 +443,79 @@ document.getElementById('copy-btn').addEventListener('click', () => {
 
 // File upload
 const fi=document.getElementById('docx-input'), dz=document.getElementById('drop-zone'), fn=document.getElementById('file-name'), db=document.getElementById('docx-btn');
-fi.addEventListener('change', () => { if(fi.files.length){fn.textContent=fi.files[0].name;db.disabled=false;} });
+const detectedPanel=document.getElementById('detected-panel'), detectedGrid=document.getElementById('detected-grid'), detectedLoading=document.getElementById('detected-loading');
+let lastDetected = null;
+
+const META_LABELS = [
+  ['author','Author'],['last_modified_by','Last Modified By'],['title','Title'],['subject','Subject'],
+  ['keywords','Keywords'],['category','Category'],['comments','Comments'],
+  ['content_status','Content Status'],['identifier','Identifier'],['language','Language'],['version','Version'],
+  ['revision','Revision'],['created','Created'],['modified','Modified'],['last_printed','Last Printed'],
+];
+
+function renderDetected(meta) {
+  detectedGrid.innerHTML = META_LABELS.map(([k,label]) => {
+    const v = meta[k];
+    const empty = v === '' || v === 0 || v === null || v === undefined;
+    const display = empty ? '(empty)' : String(v);
+    return `<div class="detected-row"><span class="detected-key">${label}</span><span class="detected-val${empty?' empty':''}">${display.replace(/</g,'&lt;')}</span></div>`;
+  }).join('');
+  detectedPanel.classList.add('visible');
+}
+
+async function inspectFile(file) {
+  lastDetected = null;
+  detectedPanel.classList.remove('visible');
+  detectedLoading.style.display = 'block';
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch('/api/inspect-docx', { method:'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to read metadata');
+    lastDetected = data.metadata;
+    renderDetected(data.metadata);
+  } catch(e) {
+    const toast = document.getElementById('docx-toast');
+    toast.className = 'toast error'; toast.textContent = e.message;
+  } finally {
+    detectedLoading.style.display = 'none';
+  }
+}
+
+function handleFileSelected() {
+  if (!fi.files.length) return;
+  fn.textContent = fi.files[0].name;
+  db.disabled = false;
+  inspectFile(fi.files[0]);
+}
+
+fi.addEventListener('change', handleFileSelected);
 dz.addEventListener('dragover', e=>{e.preventDefault();dz.classList.add('dragover');});
 dz.addEventListener('dragleave', ()=>dz.classList.remove('dragover'));
-dz.addEventListener('drop', e=>{e.preventDefault();dz.classList.remove('dragover');if(e.dataTransfer.files.length){fi.files=e.dataTransfer.files;fn.textContent=e.dataTransfer.files[0].name;db.disabled=false;}});
+dz.addEventListener('drop', e=>{
+  e.preventDefault(); dz.classList.remove('dragover');
+  if(e.dataTransfer.files.length){ fi.files=e.dataTransfer.files; handleFileSelected(); }
+});
+
+document.getElementById('prefill-btn').addEventListener('click', () => {
+  if (!lastDetected) return;
+  const m = lastDetected;
+  document.getElementById('meta-author').value = m.author || '';
+  document.getElementById('meta-modified-by').value = m.last_modified_by || '';
+  document.getElementById('meta-title').value = m.title || '';
+  document.getElementById('meta-subject').value = m.subject || '';
+  document.getElementById('meta-revision').value = m.revision || '';
+  if (m.language) {
+    const langSel = document.getElementById('meta-language');
+    const exists = Array.from(langSel.options).some(o => o.value === m.language);
+    if (exists) langSel.value = m.language;
+  }
+  document.getElementById('meta-created').value = m.created || '';
+  document.getElementById('meta-modified').value = m.modified || '';
+  const btn = document.getElementById('prefill-btn');
+  btn.textContent = 'Filled ✓'; setTimeout(()=>btn.textContent='Use these values', 1500);
+});
 
 // Docx upload with metadata
 db.addEventListener('click', async () => {
